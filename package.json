@@ -1,0 +1,43 @@
+{
+  "name": "gtpe-server",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "koa": "^2.6.2"
+  },
+  "devDependencies": {
+    "eslint": "^5.9.0",
+    "eslint-plugin-prettier": "^3.0.0",
+    "husky": "^1.2.0",
+    "jest": "^23.6.0",
+    "lint-staged": "^8.1.0",
+    "prettier": "^1.15.2"
+  },
+  "scripts": {
+    "precommit": "lint-staged",
+    "test": "ENV=test jest --watch",
+    "dev": "ENV=test nodemon"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,css,md}": [
+      "eslint --fix .",
+      "git add"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrcknz/gtpe-server.git"
+  },
+  "keywords": [
+    "graphql",
+    "node",
+    "apollo"
+  ],
+  "author": "Marco Kunz, Christopher Bücklein, Damien Derail, Berta Cume, Arturo Branco Moreira Pinto dos Santos",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mrcknz/gtpe-server/issues"
+  },
+  "homepage": "https://github.com/mrcknz/gtpe-server#readme"
+}
