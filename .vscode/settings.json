@@ -1,0 +1,14 @@
+{
+  "editor.tabSize": 2,
+  "prettier.graphqlEnable": [
+    "graphql"
+  ],
+  "prettier.jsonEnable": [
+    "json"
+  ],
+  "prettier.openOutput": false,
+  "prettier.tabWidth": 2,
+  "prettier.useTabs": false,
+  "prettier.alignObjectProperties": true
+
+}
