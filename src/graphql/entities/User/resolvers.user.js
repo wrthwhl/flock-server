@@ -22,6 +22,6 @@ export default {
   // So, if we query the `books` of an User, we can conveniently
   // access all the Users properties.
   User     : {
-    trip : ({ id: UserId }, _, { Trip }) => Trip.getAll().filter((trip) => trip.User === UserId)
+    // trip : ({ id: UserId }, _, { Trip }) => Trip.getAll().filter((trip) => trip.User === UserId)
   }
 };
