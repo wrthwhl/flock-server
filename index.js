@@ -1,7 +1,10 @@
 const Koa = require('koa');
 const app = new Koa();
+const Router = require('./router.js');
 
 require('dotenv').config();
+
+app.use(Router.routes());
 
 try {
   app.listen(3001);
