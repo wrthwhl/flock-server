@@ -63,3 +63,5 @@ typings/
 # custom
 *config*
 !*config.template*
+
+.env
