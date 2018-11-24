@@ -1,6 +1,7 @@
 extend type Query {
-  Trip(id: ID!): Trip!
+  trip(tripID: ID!): Trip!
   allTrips: [Trip!]!
+  tripsByUserID(userID: ID!): [Trip]!
 }
 
 extend type Mutation {

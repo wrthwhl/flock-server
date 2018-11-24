@@ -2,23 +2,29 @@ const data = {
   users        : [
     {
       firstName : 'Damien',
-      lastName  : 'Derail'
+      lastName  : 'Derail',
+      avatar    : ''
     },
     {
       firstName : 'Christopher',
-      lastName  : 'Bücklein'
+      lastName  : 'Bücklein',
+      avatarURL :
+        'https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=2214523381894195&height=50&width=50&ext=1545667808&hash=AeQS0U1scG7CstHf'
     },
     {
       firstName : 'Berta',
-      lastName  : 'Cume'
+      lastName  : 'Cume',
+      avatar    : ''
     },
     {
       firstName : 'Arturo',
-      lastName  : 'Moreira Santos'
+      lastName  : 'Moreira Santos',
+      avatar    : ''
     },
     {
       firstName : 'Marco',
-      lastName  : 'Kunz'
+      lastName  : 'Kunz',
+      avatar    : ''
     }
   ],
   trips        : [

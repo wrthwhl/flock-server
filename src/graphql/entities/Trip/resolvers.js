@@ -9,8 +9,9 @@ const creator = ({ creator }, _, { User }) => User.getOne(creator);
 
 export default {
   Query             : {
-    Trip     : (_, { id }, { Trip }) => Trip.getOne(id),
-    allTrips : (_, __, { Trip }) => Trip.getAll()
+    trip          : (_, { tripID }, { Trip }) => Trip.getOne(tripID),
+    allTrips      : (_, __, { Trip }) => Trip.getAll(),
+    tripsByUserID : (_, { userID }, { Trip }) => Trip.getAll().filter((trip) => userID in trip.participants)
   },
 
   /* Mutation          : {

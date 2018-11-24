@@ -1,4 +1,4 @@
-import typeDefs from './typeDefs.user.gql';
-import resolvers from './resolvers.user';
+import typeDefs from './typeDefs.gql';
+import resolvers from './resolvers';
 
 export { typeDefs, resolvers };
