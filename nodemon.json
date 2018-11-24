@@ -1,4 +1,5 @@
 {
+  "signal": "SIGHUP",
   "ext": "js,graphql,gql",
   "exec": "babel-node",
   "ignore": [ "node_modules" ],

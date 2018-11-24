@@ -31,7 +31,7 @@
     "test": "jest --watch",
     "lint": "eslint .",
     "mock": "ENV=test json-graphql-server db.js",
-    "dev": "ENV=dev babel-watch src/index.js"
+    "dev": "ENV=dev babel-watch src"
   },
   "lint-staged": {
     "**/*.{js,jsx,css,md}": [ "eslint --fix .", "git add" ]
@@ -41,7 +41,7 @@
     "url": "git+https://github.com/mrcknz/gtpe-server.git"
   },
   "keywords": [ "graphql", "node", "apollo" ],
-  "author": "Marco Kunz, Christopher Bücklein, Damien Derail, Berta Cume, Arturo Branco Moreira Pinto dos Santos",
+  "author": "Berta Cume, Christopher Bücklein, Damien Derail, Arturo Branco Moreira Pinto dos Santos, Marco Kunz",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/mrcknz/gtpe-server/issues"

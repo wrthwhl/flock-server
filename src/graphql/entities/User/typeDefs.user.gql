@@ -9,7 +9,6 @@ extend type Mutation {
 
 type User {
   id: ID!
-  name: String
   email: String
   firstName: String
   lastName: String

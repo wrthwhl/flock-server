@@ -1,3 +1,6 @@
+import { users } from '../../db';
+
 export default {
-  getAll : ''
+  getAll : () => Object.values(users),
+  getOne : (id) => users[id]
 };

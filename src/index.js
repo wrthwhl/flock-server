@@ -1,6 +1,7 @@
 import config from '../config';
 import createServer from './graphql/';
 import * as models from './models';
+models.User;
 
 // Here, we are passing in our models as `context`.
 // Why is this helpful?
