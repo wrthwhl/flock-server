@@ -30,7 +30,6 @@
     "precommit": "lint-staged",
     "test": "jest --watch",
     "lint": "eslint .",
-    "mock": "ENV=test json-graphql-server db.js",
     "dev": "ENV=dev babel-watch src"
   },
   "lint-staged": {

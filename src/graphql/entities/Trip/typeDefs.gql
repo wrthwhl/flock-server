@@ -23,12 +23,6 @@ type DestinationObject {
   isDictated: Boolean
 }
 
-type TimeFrameObject {
-  chosenTimeFrame: TimeFrame
-  suggestions: [TimeFrame]!
-  isDictated: Boolean
-}
-
 type Destination {
   key: ID!
   name: String!
@@ -42,17 +36,23 @@ type BudgetObject {
   isDictated: Boolean
 }
 
-type Budget {
-  value: ID!
-  name: String!
-  voters: [User]!
-  creator: User!
+type TimeFrameObject {
+  chosenTimeFrame: TimeFrame
+  suggestions: [TimeFrame]!
+  isDictated: Boolean
 }
 
 type TimeFrame {
   id: ID!
   startDate: String!
   endDate: String!
+  voters: [User]!
+  creator: User!
+}
+
+type Budget {
+  value: ID!
+  name: String!
   voters: [User]!
   creator: User!
 }
