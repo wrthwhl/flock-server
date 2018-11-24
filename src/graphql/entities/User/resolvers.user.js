@@ -9,7 +9,7 @@
 
 export default {
   Query    : {
-    User     : (_, { id }, { User }) => User.getById(id),
+    User     : (_, { id }, { User }) => User.getOne(id),
     allUsers : (_, __, { User }) => User.getAll()
   },
 
