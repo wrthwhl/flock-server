@@ -1,21 +1,25 @@
 const passport = require('./passport');
 
-module.exports = router => {
-  async function isLoggedIn(next) {
+module.exports = (router) => {
+  function* isLoggedIn(next) {
     if (this.req.isAuthenticated()) {
-      await next;
+      // console.log('logged in');
+      yield next;
     } else {
+      // console.log('redirect');
       this.redirect('/api');
     }
   }
 
-  router.get('/', async function(next) {
+  router.get('/', function() {
     if (this.req.user) {
+      // console.log('redirect from here');
       this.redirect('/api/success');
     } else {
+      // console.log('stay here, not logged in');
       this.body = {
         status: 'success',
-        data: "Hi! If you see this message, it means you're not login yet"
+        data: 'Hi! If you see this message, it means you\'re not login yet'
       };
     }
   });
@@ -23,7 +27,7 @@ module.exports = router => {
   router.get(
     '/login',
     passport.authenticate('facebook', {
-      scope: ['public_profile', 'email']
+      scope: [ 'public_profile', 'email' ]
     })
   );
 
@@ -35,19 +39,22 @@ module.exports = router => {
     })
   );
 
-  router.get('/success', isLoggedIn, function(next) {
+  router.get('/success', isLoggedIn, function() {
+    // console.log('came here at leas once');
     this.body = {
       status: 'success',
       data: this.req.user
     };
+    this.status = 200;
   });
 
-  router.get('/logout', isLoggedIn, function(next) {
+  router.get('/logout', isLoggedIn, function() {
     this.req.logout();
     this.body = {
       status: 'success',
       data: 'logout success'
     };
+    this.status = 200;
   });
 
   return router;
