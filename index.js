@@ -16,7 +16,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // router.use('/api', api.routes());
-
 app.use(router.routes());
 app.use(router.allowedMethods());
 
