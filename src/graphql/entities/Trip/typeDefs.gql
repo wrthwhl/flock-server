@@ -1,6 +1,6 @@
 extend type Query {
-  trip(tripID: ID!): Trip!
-  allTrips: [Trip!]!
+  trip(tripID: ID!): Trip
+  allTrips: [Trip]!
   tripsByUserID(userID: ID!): [Trip]!
 }
 
