@@ -28,12 +28,14 @@
   "scripts": {
     "postinstall": "cp -n config.template.js config.js",
     "precommit": "lint-staged",
-    "test": "jest --watch",
+    "prepush": "npm run test",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
     "lint": "eslint .",
     "dev": "ENV=dev babel-watch src"
   },
   "lint-staged": {
-    "**/*.{js,jsx,css,md}": [ "eslint --fix .", "git add" ]
+    "**/*.{js,jsx}": [ "eslint --fix", "git add" ]
   },
   "repository": {
     "type": "git",

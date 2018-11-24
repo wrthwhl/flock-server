@@ -1,4 +1,4 @@
-import { users } from '../../db';
+import { users } from '../../mock-db';
 
 export default {
   getAll : () => Object.values(users),

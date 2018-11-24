@@ -1,4 +1,4 @@
-import { trips } from '../../db';
+import { trips } from '../../mock-db';
 
 export default {
   getAll    : () => Object.values(trips),
