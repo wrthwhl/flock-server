@@ -1,0 +1,68 @@
+extend type Query {
+  trip(tripID: ID!): Trip
+  allTrips: [Trip]!
+  tripsByUserID(userID: ID!): [Trip]!
+}
+
+extend type Mutation {
+  updateTrip(input: updateTripInput!): updatedTrip!
+}
+
+type Trip {
+  id: ID!
+  name: String!
+  participants: [User]!
+  destination: DestinationObject!
+  budget: BudgetObject!
+  timeFrame: TimeFrameObject
+}
+
+type DestinationObject {
+  chosenDestination: Destination
+  suggestions: [Destination]!
+  isDictated: Boolean
+}
+
+type Destination {
+  key: ID!
+  name: String!
+  voters: [User]!
+  creator: User!
+}
+
+type BudgetObject {
+  chosenBudget: Budget
+  suggestions: [Budget]!
+  isDictated: Boolean
+}
+
+type TimeFrameObject {
+  chosenTimeFrame: TimeFrame
+  suggestions: [TimeFrame]!
+  isDictated: Boolean
+}
+
+type TimeFrame {
+  id: ID!
+  startDate: String!
+  endDate: String!
+  voters: [User]!
+  creator: User!
+}
+
+type Budget {
+  value: ID!
+  name: String!
+  voters: [User]!
+  creator: User!
+}
+
+input updateTripInput {
+  id: ID!
+  name: String
+}
+
+type updatedTrip {
+  id: ID!
+  name: String
+}
