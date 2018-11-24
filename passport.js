@@ -12,6 +12,8 @@ passport.use(
       profileFields: config.profileFields
     },
     (accessToken, refreshToken, profile, done) => {
+      // console.log('//////////TOKEN', accessToken, '/////////PROFILE', profile);
+
       return done(null, profile);
     }
   )

@@ -13,6 +13,7 @@
     "koa-pg-session": "^2.0.1",
     "koa-router": "^7.4.0",
     "koa-session": "^5.10.0",
+    "oauth2orize-koa-facebook": "0.0.2",
     "passport": "^0.4.0",
     "passport-facebook": "^2.1.1"
   },
