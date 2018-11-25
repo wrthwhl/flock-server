@@ -7,7 +7,8 @@
     "apollo-server": "^2.2.2",
     "graphql": "^14.0.2",
     "koa": "^2.6.2",
-    "lodash.merge": "^4.6.1"
+    "lodash.merge": "^4.6.1",
+    "mongoose": "^5.3.13"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -34,13 +35,20 @@
     "dev": "ENV=dev babel-watch src/index.js"
   },
   "lint-staged": {
-    "**/*.{js,jsx,css,md}": [ "eslint --fix .", "git add" ]
+    "**/*.{js,jsx,css,md}": [
+      "eslint --fix .",
+      "git add"
+    ]
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mrcknz/gtpe-server.git"
   },
-  "keywords": [ "graphql", "node", "apollo" ],
+  "keywords": [
+    "graphql",
+    "node",
+    "apollo"
+  ],
   "author": "Marco Kunz, Christopher Bücklein, Damien Derail, Berta Cume, Arturo Branco Moreira Pinto dos Santos",
   "license": "MIT",
   "bugs": {
