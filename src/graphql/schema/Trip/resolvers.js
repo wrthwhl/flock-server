@@ -1,12 +1,4 @@
-// TODO refactor helpers into seperate helper file
-const mergeProps = (key, ...objects) => ({
-  key,
-  ...objects.reduce((arr, obj) => ({ ...arr, ...(obj[key] || obj(key)) }), {})
-});
-
-const voters = ({ voters }, _, { User }) => voters.map((id) => User.getOne(id));
-
-const creator = ({ creator }, _, { User }) => User.getOne(creator);
+import { mergeProps, voters, creator } from '../resolver-helpers';
 
 export default {
   Query             : {
