@@ -1,5 +1,5 @@
 import config from '../config';
-import createServer from './graphql/';
+import createServer from './graphql/server';
 import * as models from './models';
 
 // Here, we are passing in our models as `context`.

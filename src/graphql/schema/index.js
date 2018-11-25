@@ -1,12 +1,12 @@
 import merge from 'lodash.merge';
 
 // Root types
-import rootTypeDefs from './typeDefs.gql';
-import rootResolvers from './resolvers';
+import rootTypeDefs from './root.typeDefs.gql';
+import rootResolvers from './root.resolvers';
 
 // Entity types
-import { typeDefs as User, resolvers as userResolvers } from '../entities/User';
-import { typeDefs as Trip, resolvers as tripResolvers } from '../entities/Trip';
+import { typeDefs as User, resolvers as userResolvers } from './User';
+import { typeDefs as Trip, resolvers as tripResolvers } from './Trip';
 
 export default {
   // Apollo Server accepts an array of type definitions 👍
