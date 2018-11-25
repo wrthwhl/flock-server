@@ -1,5 +1,5 @@
 extend type Query {
-  User(id: ID!): User!
+  User(id: ID!): User
   allUsers: [User!]!
 }
 
@@ -13,6 +13,7 @@ type User {
   avatarURL: String
   firstName: String
   lastName: String
+  trips: [Trip]
 }
 
 input updateUserInput {
