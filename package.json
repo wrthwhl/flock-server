@@ -28,8 +28,8 @@
   "scripts": {
     "postinstall": "cp -n config.template.js config.js",
     "precommit": "lint-staged",
-    "prepush": "npm run test",
-    "test": "jest --coverage",
+    "prepush": "jest --coverage",
+    "test": "jest --verbose || true",
     "test:watch": "jest --watch",
     "lint": "eslint .",
     "dev": "ENV=dev babel-watch src"
