@@ -1,5 +1,5 @@
 extend type Query {
-  User(id: ID!): User
+  user(id: ID!): User
   allUsers: [User!]!
 }
 

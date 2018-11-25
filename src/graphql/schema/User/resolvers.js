@@ -1,6 +1,6 @@
 export default {
   Query    : {
-    User     : (_, { id }, { User }) => User.getOne(id),
+    user     : (_, { id }, { User }) => User.getOne(id),
     allUsers : (_, __, { User }) => User.getAll()
   },
 
