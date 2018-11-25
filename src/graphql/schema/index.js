@@ -4,7 +4,6 @@ import merge from 'lodash.merge';
 import rootTypeDefs from './root.typeDefs.gql';
 import rootResolvers from './root.resolvers';
 
-// Entity types
 import { typeDefs as User, resolvers as userResolvers } from './User';
 import { typeDefs as Trip, resolvers as tripResolvers } from './Trip';
 

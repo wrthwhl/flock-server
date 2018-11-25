@@ -1,3 +1,4 @@
+// TODO refactor helpers into seperate helper file
 const mergeProps = (key, ...objects) => ({
   key,
   ...objects.reduce((arr, obj) => ({ ...arr, ...(obj[key] || obj(key)) }), {})
@@ -49,6 +50,4 @@ export default {
     voters,
     creator
   }
-
-  // Suggestions       : {}
 };
