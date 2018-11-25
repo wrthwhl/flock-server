@@ -181,7 +181,7 @@ const dataTrip = {
 //   }));
 // };
 
-console.log('hey', users(data.users)); // eslint-disable-line no-console
+// console.log('hey', users(data.users)); // eslint-disable-line no-console
 // console.log('hey', trips(dataTrip.trips)); // eslint-disable-line no-console
 export default {
   users: users(data.users),
