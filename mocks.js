@@ -32,30 +32,36 @@ const data = {
       name         : 'Graduation Trip',
       participants : [ 0, 1, 2, 3, 4 ],
       destination  : {
-        chosenDestination : 'barcelona',
-        suggestions       : {
-          grenoble  : {
+        isDicatated       : false,
+        chosenDestination : 0,
+        suggestions       : [
+          {
+            name    : 'Grenoble',
             voters  : [ 0 ],
             creator : 0
           },
-          cologne   : {
+          {
+            name    : 'cologne',
             voters  : [ 1 ],
             creator : 1
           },
-          barcelona : {
+          {
+            name    : 'barcelona',
             voters  : [ 2 ],
             creator : 2
           },
-          saoPaulo  : {
+          {
+            name    : 'saoPaulo',
             voters  : [ 3 ],
             creator : 3
           },
-          zurich    : {
+          {
+            name    : 'zurich',
             voters  : [ 4 ],
             creator : 4
           }
-        }
-      },
+        ]
+      } /* ,
       budget       : {
         chosenBudget : 500,
         suggestions  : {
@@ -115,7 +121,7 @@ const data = {
             creator   : 4
           }
         }
-      }
+      } */
     }
   ],
   destinations : {
@@ -137,7 +143,7 @@ const data = {
   }
 };
 
-const users = (users) => {
+const buildUsers = (users) => {
   let res = {};
   users.forEach(
     ({ firstName, lastName }, id) =>
@@ -151,7 +157,16 @@ const users = (users) => {
   return res;
 };
 
-const trips = (trips) => {
+function getUsers(users) {
+  return function*(n = 1) {
+    let i = 0;
+    while (i++ < n) {
+      yield users[i % users.length];
+    }
+  };
+}
+
+/* const trips = (trips) => {
   let res = {};
   trips.forEach(
     (trip, id) =>
@@ -161,10 +176,10 @@ const trips = (trips) => {
       })
   );
   return res;
-};
+}; */
 
 module.exports = {
-  users        : users(data.users),
-  trips        : trips(data.trips),
-  destinations : data.destinations
+  getUsers : getUsers(buildUsers(data.users)),
+  trips    : data.trips //        : trips(data.trips),
+  // destinations : data.destinations
 };
