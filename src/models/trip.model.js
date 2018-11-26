@@ -1,6 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 import data from '../data';
 
+
 const TripSchema = new Schema({
   name         : String,
   participants : Array,
@@ -8,7 +9,7 @@ const TripSchema = new Schema({
     chosenDestination : String,
     suggestions       : {
       String : {
-        voters  : [Number],
+        voters  : [String],
         creator : Number
       }
     }
@@ -17,7 +18,7 @@ const TripSchema = new Schema({
     choosenBudget : Number,
     suggestions   : {
       Number : {
-        voters  : Array,
+        voters  : [String],
         creator : Number
       }
     }
@@ -28,7 +29,7 @@ const TripSchema = new Schema({
       Number : {
         startDate : Date,
         endDate   : Date,
-        voters    : Array,
+        voters    : [String],
         creator   : Number
       }
     }

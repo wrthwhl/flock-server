@@ -19,12 +19,12 @@ type User {
 
 input updateUserInput {
   id: ID!
-  name: String
+  firstName: String
 }
 
 type updateUser {
   id: ID
-  name: String
+  firstName: String
 }
 
 input createUserInput {

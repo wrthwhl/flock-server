@@ -7,7 +7,7 @@ export default {
   },
 
   Mutation : {
-    updateUser : (_, { input: { id, ...update } }, { User }) => User.updateOne(id, update),
+    updateUser : (_, {input:  {...update} }, { User }) => User.updateOne(update),
     createUser : (_, {input: {firstName, lastName, email, avatar_url}}, { User }) => User.create({
       firstName,
       lastName,
