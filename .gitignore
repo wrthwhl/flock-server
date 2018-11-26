@@ -63,3 +63,4 @@ typings/
 # custom
 *config*
 !*config.template*
+dist
