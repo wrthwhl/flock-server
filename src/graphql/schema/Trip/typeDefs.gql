@@ -50,8 +50,9 @@ type TimeFrameObject {
 }
 
 type TimeFrame {
-  startDate: String
-  endDate: String
+  id: ID!
+  startDate: Date!
+  endDate: Date!
   voters: [User!]!
   creator: User!
 }
