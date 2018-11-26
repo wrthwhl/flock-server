@@ -20,11 +20,17 @@ type User {
 input updateUserInput {
   id: ID!
   firstName: String
+  lastName: String
+  email: String
+  avatarURL: String
 }
 
 type updateUser {
   id: ID
   firstName: String
+  lastName: String
+  email: String
+  avatarURL: String
 }
 
 input createUserInput {
