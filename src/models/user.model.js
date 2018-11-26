@@ -1,9 +1,24 @@
-import { users } from '../../mock-db';
+import mongoose, { Schema } from 'mongoose';
+import data from '../data';
 
-export default {
-  getAll : () => Object.values(users),
-  getOne : (id) => users[id]
-};
+const UserSchema = new Schema({
+  id         : Number,
+  firstName  : String,
+  lastName   : String,
+  email      : String,
+  avatar_url : String
+});
+
+const User = mongoose.model('users', UserSchema);
+
+(async function() {
+  await User.deleteMany({});
+  data.users.forEach(async (user) => {
+    await User.create(user);
+  });
+})();
+
+export default User;
 
 // import db from './index';
 // import UserModel from './index';

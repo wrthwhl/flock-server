@@ -1,6 +1,6 @@
 extend type Query {
   user(id: ID!): User
-  allUsers: [User!]!
+  allUsers: [User]!
 }
 
 extend type Mutation {
