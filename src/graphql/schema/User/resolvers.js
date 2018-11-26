@@ -9,6 +9,6 @@ export default {
   },
 
   User     : {
-    trips : ({ id }, _, { Trip }) => Trip.byUserID(id)
+    trips : ({ id }, _, { Trip }) => Trip.byUserID(id) && []
   }
 };
