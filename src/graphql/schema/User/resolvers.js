@@ -1,7 +1,7 @@
 export default {
   Query    : {
-    user     : (_, { id }, { User }) => User.getOne(id),
-    allUsers : (_, __, { User }) => User.getAll()
+    user     : (_, { id }, { User }) => User.findOne({ id: Number(id) }),
+    allUsers : (_, __, { User }) => User.find()
   },
 
   Mutation : {
@@ -9,6 +9,6 @@ export default {
   },
 
   User     : {
-    trips : ({ id }, _, { Trip }) => Trip.byUserID(id)
+    trips : ({ id }, _, { Trip }) => Trip.find({ participants: id })
   }
 };
