@@ -4,7 +4,8 @@ extend type Query {
 }
 
 extend type Mutation {
-  updateUser(input: updateUserInput!): updatedUser!
+  updateUser(input: updateUserInput!): updateUser!,
+  createUser(input: createUserInput!): createUser!
 }
 
 type User {
@@ -21,7 +22,21 @@ input updateUserInput {
   name: String
 }
 
-type updatedUser {
-  id: ID!
+type updateUser {
+  id: ID
   name: String
+}
+
+input createUserInput {
+  email: String!
+  avatarURL: String
+  firstName: String!
+  lastName: String!
+}
+
+type createUser {
+  email: String
+  avatarURL: String
+  firstName: String
+  lastName: String
 }

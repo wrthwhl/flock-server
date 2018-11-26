@@ -8,7 +8,7 @@ const TripSchema = new Schema({
     chosenDestination : String,
     suggestions       : {
       String : {
-        voters  : Array,
+        voters  : [Number],
         creator : Number
       }
     }
