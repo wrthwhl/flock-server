@@ -168,20 +168,22 @@ const dataTrip = {
   }
 };
 
-// const trips = trips => {
-//   return trips.map((trip, id) => ({
-//     id: {
-//       id,
-//       ...trip
-//     }
-//   }));
-// };
+const trips = trips => {
+  let res = [];
+  trips.forEach((name, id) =>
+    res.push({
+      id,
+      ...name
+    })
+  );
+  return res;
+};
 
-// console.log('hey', users(data.users)); // eslint-disable-line no-console
-// console.log('hey', trips(dataTrip.trips)); // eslint-disable-line no-console
+
+
+console.log('hey', trips(dataTrip.trips)); // eslint-disable-line no-console
 export default {
   users : users(data.users),
-  trips : dataTrip.trips
-  // trips: trips(data.trips),
+  trips: trips(dataTrip.trips),
   // destinations: trips(data.destinations)
 };

@@ -2,7 +2,8 @@ import { mergeProps, voters, creator } from '../resolver-helpers';
 
 export default {
   Query             : {
-    trip     : (_, { tripID }, { Trip }) => Trip.findOne(tripID),
+    // trip     : (_, { tripID }, { Trip }) => Trip.findOne(tripID),
+    trip     : (_, { id }, { Trip }) => Trip.findOne(id),
     allTrips : (_, __, { Trip }) => Trip.find()
   },
 
@@ -11,8 +12,8 @@ export default {
   }, */
 
   Trip              : {
-    participants : (_, __, { User }) => Object.values(User.getAll()),
-    destination  : ({ id }, _, { Trip }) => Trip.getOne(id).destination
+    participants : (_, __, { User }) => Object.values(User.find()),
+    destination  : ({ id }, _, { Trip }) => Trip.findOne(id).destination
   },
   DestinationObject : {
     suggestions       : ({ suggestions }, _, { Destination }) =>
