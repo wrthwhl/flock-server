@@ -18,16 +18,17 @@ type Trip {
 }
 
 type DestinationObject {
-  chosenDestination: Destination
+  chosenDestination: String
   suggestions: [Destination]!
   isDictated: Boolean
 }
 
 type Destination {
   key: ID!
+  isDictated: Boolean!
   name: String!
-  voters: [User]!
-  creator: User!
+  voters: [User]
+  creator: User
 }
 
 type BudgetObject {
@@ -69,8 +70,12 @@ type updatedTrip {
 
 input createTripInput {
   name: String
+  isDictated: Boolean
+  suggestions: String
 }
 
 type createTrip {
   name: String
+  destination: DestinationObject
+  suggestions: Destination
 }

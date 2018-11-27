@@ -1,5 +1,6 @@
 import { mergeProps, voters, creator } from '../resolver-helpers';
 
+
 export default {
   Query             : {
     trip     : (_, { id }, { Trip }) => Trip.findOne(id),
@@ -8,8 +9,12 @@ export default {
 
   Mutation          : {
     updateTrip : (_, { input: { ...update } }, { Trip }) => Trip.findOneAndUpdate(update),
-    createTrip : (_, {input: {name} }, { Trip }) => Trip.create({
-      name
+    createTrip : (_, {input: {name, isDictated, suggestions} }, { Trip }) => Trip.create({
+      name,
+      destination: {
+        isDictated: isDictated,
+        suggestions: [suggestions]
+      }
     }),
 
 

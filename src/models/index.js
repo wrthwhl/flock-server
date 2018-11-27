@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 export { default as User } from './user.model';
 export { default as Trip } from './trip.model';
+export { default as Destination } from './destination.model';
 
 export default mongoose
   .connect('mongodb://localhost/travelroo', { useNewUrlParser: true })
