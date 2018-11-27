@@ -2,13 +2,17 @@ import { mergeProps, voters, creator } from '../resolver-helpers';
 
 export default {
   Query             : {
-    // trip     : (_, { tripID }, { Trip }) => Trip.findOne(tripID),
     trip     : (_, { id }, { Trip }) => Trip.findOne(id),
     allTrips : (_, __, { Trip }) => Trip.find()
   },
 
   Mutation          : {
-    updateTrip : (_, { input: { ...update } }, { Trip }) => Trip.findOneAndUpdate(update)
+    updateTrip : (_, { input: { ...update } }, { Trip }) => Trip.findOneAndUpdate(update),
+    createTrip : (_, {input: {name} }, { Trip }) => Trip.create({
+      name
+    }),
+
+
   },
 
   Trip              : {

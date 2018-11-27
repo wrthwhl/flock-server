@@ -170,10 +170,10 @@ const dataTrip = {
 
 const trips = trips => {
   let res = [];
-  trips.forEach((name, id) =>
+  trips.forEach((args, id) =>
     res.push({
       id,
-      ...name
+      ...args
     })
   );
   return res;

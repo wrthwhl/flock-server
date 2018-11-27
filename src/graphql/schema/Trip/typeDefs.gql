@@ -5,6 +5,7 @@ extend type Query {
 
 extend type Mutation {
   updateTrip(input: updateTripInput!): updatedTrip!
+  createTrip(input: createTripInput!): createTrip!
 }
 
 type Trip {
@@ -63,5 +64,13 @@ input updateTripInput {
 
 type updatedTrip {
   id: ID!
+  name: String
+}
+
+input createTripInput {
+  name: String
+}
+
+type createTrip {
   name: String
 }
