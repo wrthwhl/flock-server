@@ -7,9 +7,9 @@ export default {
     allTrips : (_, __, { Trip }) => Trip.find()
   },
 
-  /* Mutation          : {
-    updateTrip : (_, { input: { id, ...update } }, { Trip }) => Trip.updateOne(id, update)
-  }, */
+  Mutation          : {
+    updateTrip : (_, { input: { ...update } }, { Trip }) => Trip.findOneAndUpdate(update)
+  },
 
   Trip              : {
     participants : (_, __, { User }) => Object.values(User.find()),
