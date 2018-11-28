@@ -9,15 +9,9 @@ export default {
 
   Mutation          : {
     updateTrip : (_, { input: { ...update } }, { Trip }) => Trip.findOneAndUpdate(update),
-    createTrip : (_, {input: {name, isDictated, suggestions} }, { Trip }) => Trip.create({
-      name,
-      destination: {
-        isDictated: isDictated,
-        suggestions: [suggestions]
-      }
-    }),
-
-
+    createTrip : (_, {input}, { Trip }) => Trip.create(
+      input
+    )
   },
 
   Trip              : {

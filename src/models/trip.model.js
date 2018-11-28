@@ -67,7 +67,7 @@ const Trip = mongoose.model('trips', TripSchema);
     },
     budget       : {
       isDictated        : false,
-      chosenDestination : null,
+      chosenBudget : null,
       suggestions       : [
         {
           value   : 500,
@@ -78,7 +78,7 @@ const Trip = mongoose.model('trips', TripSchema);
     },
     timeFrame    : {
       isDictated        : true,
-      chosenDestination : null,
+      chosenTimeFrame : null,
       suggestions       : [
         {
           startDate : '2018-12-16',
@@ -90,57 +90,6 @@ const Trip = mongoose.model('trips', TripSchema);
     }
   });
   // const trips = await Trip.find();
-  // console.log(trips[0]);
 })();
 
 export default Trip;
-
-
-// import mongoose, { Schema } from 'mongoose';
-// import data from '../data';
-//
-//
-// const TripSchema = new Schema({
-//   name         : String,
-//   participants : Array,
-//   destination  : {
-//     chosenDestination : String,
-//     suggestions       : {
-//       String : {
-//         voters  : [String],
-//         creator : Number
-//       }
-//     }
-//   },
-//   budget       : {
-//     choosenBudget : Number,
-//     suggestions   : {
-//       Number : {
-//         voters  : [String],
-//         creator : Number
-//       }
-//     }
-//   },
-//   timeFrame    : {
-//     chosenTimeFrame : String,
-//     suggestions     : {
-//       Number : {
-//         startDate : Date,
-//         endDate   : Date,
-//         voters    : [String],
-//         creator   : Number
-//       }
-//     }
-//   }
-// });
-//
-// const Trip = mongoose.model('trips', TripSchema);
-//
-// (async function() {
-//   await Trip.deleteMany({});
-//   data.trips.forEach(async (trip) => {
-//     await Trip.create(trip);
-//   });
-// })();
-//
-// export default Trip;

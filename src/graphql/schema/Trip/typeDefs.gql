@@ -5,27 +5,26 @@ extend type Query {
 
 extend type Mutation {
   updateTrip(input: updateTripInput!): updatedTrip!
-  createTrip(input: createTripInput!): createTrip!
+  createTrip(input: createTripInput!): Trip
 }
 
 type Trip {
   id: ID!
   name: String!
   participants: [User]!
-  destination: DestinationObject!
+  destination: DestinationObject
   budget: BudgetObject!
   timeFrame: TimeFrameObject
 }
 
 type DestinationObject {
-  chosenDestination: String
+  chosenDestination: Destination
   suggestions: [Destination]!
   isDictated: Boolean
 }
 
 type Destination {
   key: ID!
-  isDictated: Boolean!
   name: String!
   voters: [User]
   creator: User
@@ -44,18 +43,17 @@ type TimeFrameObject {
 }
 
 type TimeFrame {
-  id: ID!
-  startDate: String!
-  endDate: String!
-  voters: [User]!
-  creator: User!
+  startDate: String
+  endDate: String
+  voters: [User]
+  creator: User
 }
 
 type Budget {
-  value: ID!
-  name: String!
-  voters: [User]!
-  creator: User!
+  id: ID!
+  value: Int!
+  voters: [User]
+  creator: User
 }
 
 input updateTripInput {
@@ -68,14 +66,56 @@ type updatedTrip {
   name: String
 }
 
-input createTripInput {
-  name: String
+input DestinationObjectInput {
+  chosenDestination: DestinationInput
+  suggestions: [DestinationInput]!
   isDictated: Boolean
-  suggestions: String
 }
 
-type createTrip {
+input BudgetObjectInput {
+  chosenBudget: BudgetInput
+  suggestions: [BudgetInput]!
+  isDictated: Boolean
+}
+
+input createTripInput {
+  name: String!
+  participants: [String]
+  destination: DestinationObjectInput
+  budget: BudgetObjectInput
+  timeFrame: TimeFrameObjectInput
+}
+
+input DestinationInput {
   name: String
-  destination: DestinationObject
-  suggestions: Destination
+  voters: [ID]
+  creator: ID
+
+}
+
+input BudgetInput {
+  value: Int
+  voters: [ID]
+  creator: ID
+}
+
+input TimeFrameInput {
+  startDate: String
+  endDate: String
+  voters: [ID]
+  creator: ID
+}
+
+input UserInput {
+  email: String
+  avatarURL: String
+  firstName: String
+  lastName: String
+}
+
+
+input TimeFrameObjectInput {
+  chosenTimeFrame: TimeFrameInput
+  suggestions: [TimeFrameInput]!
+  isDictated: Boolean
 }
