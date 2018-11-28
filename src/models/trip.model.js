@@ -44,22 +44,25 @@ const Trip = mongoose.model('trips', TripSchema);
 
 (async function() {
   await Trip.deleteMany({});
-  await Trip.create({
+  const trip = {
+    _id          : '000000000000000000000000',
     name         : 'Graduation Trip',
     participants : [
-      '5bfc4455e3833d7f2a7ff22b',
-      '5bfc4455e3833d7f2a7ff22a',
-      '5bfc4455e3833d7f2a7ff229',
-      '5bfc4455e3833d7f2a7ff228'
+      '000000000000000000000000',
+      '111111111111111111111111',
+      '222222222222222222222222',
+      '333333333333333333333333',
+      '444444444444444444444444'
     ],
     destination  : {
       isDictated        : false,
-      chosenDestination : null,
+      chosenDestination : '000000000000000000000000',
       suggestions       : [
         {
+          _id     : '000000000000000000000000',
           name    : 'Barcelona',
-          voters  : [ '5bfc4455e3833d7f2a7ff22b', '5bfc4455e3833d7f2a7ff22a' ],
-          creator : '5bfc4455e3833d7f2a7ff22b'
+          voters  : [ '222222222222222222222222', '000000000000000000000000' ],
+          creator : '222222222222222222222222'
         }
       ]
     },
@@ -69,8 +72,8 @@ const Trip = mongoose.model('trips', TripSchema);
       suggestions       : [
         {
           value   : 500,
-          voters  : [ '5bfc4455e3833d7f2a7ff22b', '5bfc4455e3833d7f2a7ff22a' ],
-          creator : '5bfc4455e3833d7f2a7ff22b'
+          voters  : [ '333333333333333333333333', '444444444444444444444444' ],
+          creator : '333333333333333333333333'
         }
       ]
     },
@@ -81,14 +84,13 @@ const Trip = mongoose.model('trips', TripSchema);
         {
           startDate : '2018-12-16',
           endDate   : '2018-12-23',
-          voters    : [ '5bfc4455e3833d7f2a7ff22b', '5bfc4455e3833d7f2a7ff22a' ],
-          creator   : '5bfc4455e3833d7f2a7ff22b'
+          voters    : [ '111111111111111111111111', '444444444444444444444444' ],
+          creator   : '111111111111111111111111'
         }
       ]
     }
-  });
-  const trips = await Trip.find();
-  console.log(trips[0]);
+  };
+  await Trip.create(trip);
 })();
 
 export default Trip;

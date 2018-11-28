@@ -1,32 +1,4 @@
-const data = {
-  users        : [
-    {
-      firstName : 'Damien',
-      lastName  : 'Derail',
-      avatar    : ''
-    },
-    {
-      firstName : 'Christopher',
-      lastName  : 'Bücklein',
-      avatarURL :
-        'https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=2214523381894195&height=50&width=50&ext=1545667808&hash=AeQS0U1scG7CstHf'
-    },
-    {
-      firstName : 'Berta',
-      lastName  : 'Cume',
-      avatar    : ''
-    },
-    {
-      firstName : 'Arturo',
-      lastName  : 'Moreira Santos',
-      avatar    : ''
-    },
-    {
-      firstName : 'Marco',
-      lastName  : 'Kunz',
-      avatar    : ''
-    }
-  ],
+/* const data = {
   trips        : [
     {
       name         : 'Graduation Trip',
@@ -61,7 +33,9 @@ const data = {
             creator : 4
           }
         ]
-      } /* ,
+      } */
+
+/* ,
       budget       : {
         chosenBudget : 500,
         suggestions  : {
@@ -121,7 +95,7 @@ const data = {
             creator   : 4
           }
         }
-      } */
+      }
     }
   ],
   destinations : {
@@ -143,29 +117,6 @@ const data = {
   }
 };
 
-const buildUsers = (users) => {
-  let res = {};
-  users.forEach(
-    ({ firstName, lastName }, id) =>
-      (res[id] = {
-        id,
-        firstName,
-        lastName,
-        email     : firstName.toLowerCase() + '@travelnuts.io'
-      })
-  );
-  return res;
-};
-
-function getUsers(users) {
-  return function*(n = 1) {
-    let i = 0;
-    while (i++ < n) {
-      yield users[i % users.length];
-    }
-  };
-}
-
 /* const trips = (trips) => {
   let res = {};
   trips.forEach(
@@ -177,9 +128,9 @@ function getUsers(users) {
   );
   return res;
 }; */
-
+/*
 module.exports = {
   getUsers : getUsers(buildUsers(data.users)),
   trips    : data.trips //        : trips(data.trips),
   // destinations : data.destinations
-};
+}; */

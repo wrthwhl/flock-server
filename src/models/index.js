@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 export { default as User } from './user.model';
 export { default as Trip } from './trip.model';
+export { default as Destination } from './destination.model';
 
 export default {
   launch : (...config) => {
@@ -8,6 +9,11 @@ export default {
       .connect(...config)
       .then(() => console.log('✔️  Successfully connected to MongoDB!')) //eslint-disable-line no-console
       .catch((err) => console.error('❌  Could not connect to MongoDB!', err)); //eslint-disable-line no-console
-    return mongoose;
+  },
+  close  : () => {
+    mongoose.connection
+      .close()
+      .then(() => console.log('✔️  Successfully disconnected from MongoDB!')) //eslint-disable-line no-console
+      .catch((err) => console.error('❌  Could not disconnect to MongoDB!', err)); //eslint-disable-line no-console
   }
 };
