@@ -35,6 +35,6 @@ input updateUserInput {
 input createUserInput {
   email: String!
   avatarURL: String
-  firstName: String!
-  lastName: String!
+  firstName: String
+  lastName: String
 }

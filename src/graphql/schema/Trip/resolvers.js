@@ -8,10 +8,12 @@ export default {
 
   Mutation: {
     createTrip: async (_, { trip, userID }, { Trip, User }) => {
-      !trip.destination && (trip.destination = { isDictated: false });
-      !trip.budget && (trip.budget = { isDictated: false });
-      !trip.timeFrame && (trip.timeFrame = { isDictated: false });
-      const { destination, budget, timeFrame, participants } = trip;
+      const {
+        destination = { isDictated: false },
+        budget = { isDictated: false },
+        timeFrame = { isDictated: false },
+        participants
+      } = trip;
       const matchedUsers = await User.find({ email: { $in: participants } });
       const matchedEmails = matchedUsers.map((user) => user.email);
       const newUsers = trip.participants.filter((email) => matchedEmails.indexOf(email) === -1);
@@ -24,14 +26,14 @@ export default {
           creator: userID
         }));
       }
-      if (budget && budget.suggestions && budget.suggestions.length) {
+      if (budget.suggestions && budget.suggestions.length) {
         budget.suggestions = budget.suggestions.map((value) => ({
           value,
           voters: [ userID ],
           creator: userID
         }));
       }
-      if (timeFrame && timeFrame.suggestions && timeFrame.suggestions.length) {
+      if (timeFrame.suggestions && timeFrame.suggestions.length) {
         timeFrame.suggestions = timeFrame.suggestions.map((object) => ({
           ...object,
           voters: [ userID ],
@@ -39,27 +41,28 @@ export default {
         }));
       }
       trip['creator'] = userID;
-      return Trip.create(trip);
+      return Trip.create({
+        ...trip,
+        destination,
+        budget,
+        timeFrame
+      });
     }
   },
 
   Trip: {
     participants: ({ participants }, _, { User }) => users(participants, User),
     creator
-    // destination  : ({ id }, _, { Trip }) => Trip.findOne(id)
   },
   DestinationObject: {
-    // suggestions       : ({ suggestions }, _, { Destination }) => suggestions
     chosenDestination: ({ chosenDestination, suggestions }) =>
       suggestions.find((destination) => String(chosenDestination) === String(destination._id)) || null
-    // chosenDestination ? mergeProps(chosenDestination, Destination.getOne, suggestions) : null
   },
   Destination: {
     voters,
     creator
   },
   BudgetObject: {
-    // suggestions  : ({ suggestions }) => suggestions,
     chosenBudget: ({ chosenBudget, suggestions }) =>
       chosenBudget || suggestions.find((budget) => chosenBudget === budget._id)
   },
@@ -68,7 +71,6 @@ export default {
     creator
   },
   TimeFrameObject: {
-    // suggestions     : ({ suggestions }) => suggestions,
     chosenTimeFrame: ({ chosenTimeFrame, suggestions }) =>
       chosenTimeFrame || suggestions.find((timeFrame) => chosenTimeFrame === timeFrame._id)
   },
