@@ -1,5 +1,4 @@
-import { voters, creator } from '../resolver-helpers';
-
+import { users, voters, creator } from '../resolver-helpers';
 
 export default {
   Query             : {
@@ -33,15 +32,12 @@ export default {
         creator : userID
       }));
       return Trip.create(trip);
-
     }
   },
 
   Trip              : {
-
-    participants : (_, __, { User }) => Object.values(User.find()),
-    destination  : ({ id }, _, { Trip }) => Trip.findOne(id).destination
-
+    participants : ({ participants }, _, { User }) => users(participants, User)
+    // destination  : ({ id }, _, { Trip }) => Trip.findOne(id)
   },
   DestinationObject : {
     // suggestions       : ({ suggestions }, _, { Destination }) => suggestions
