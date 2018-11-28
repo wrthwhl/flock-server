@@ -1,17 +1,18 @@
 extend type Query {
-  trip(tripID: ID!): Trip
+  trip(id: ID!): Trip
   allTrips: [Trip]!
 }
 
 extend type Mutation {
-  updateTrip(input: updateTripInput!): updatedTrip!
+  createTrip(trip: TripInput!, userID: ID): Trip!
 }
 
 type Trip {
   id: ID!
   name: String!
-  participants: [User]!
-  destination: DestinationObject!
+  participants: [User!]!
+  creator: User
+  destination: DestinationObject
   budget: BudgetObject!
   timeFrame: TimeFrameObject
 }
@@ -25,7 +26,7 @@ type DestinationObject {
 type Destination {
   key: ID!
   name: String!
-  voters: [User]!
+  voters: [User!]!
   creator: User!
 }
 
@@ -35,6 +36,13 @@ type BudgetObject {
   isDictated: Boolean
 }
 
+type Budget {
+  id: ID!
+  value: Int!
+  voters: [User!]!
+  creator: User!
+}
+
 type TimeFrameObject {
   chosenTimeFrame: TimeFrame
   suggestions: [TimeFrame]!
@@ -42,26 +50,36 @@ type TimeFrameObject {
 }
 
 type TimeFrame {
-  id: ID!
-  startDate: String!
-  endDate: String!
-  voters: [User]!
+  startDate: String
+  endDate: String
+  voters: [User!]!
   creator: User!
 }
 
-type Budget {
-  value: ID!
+input TripInput {
   name: String!
-  voters: [User]!
-  creator: User!
+  participants: [String]
+  destination: DestinationObjectInput
+  budget: BudgetObjectInput
+  timeFrame: TimeFrameObjectInput
 }
 
-input updateTripInput {
-  id: ID!
-  name: String
+input DestinationObjectInput {
+  suggestions: [String]
+  isDictated: Boolean
 }
 
-type updatedTrip {
-  id: ID!
-  name: String
+input BudgetObjectInput {
+  suggestions: [Int]
+  isDictated: Boolean
+}
+
+input TimeFrameObjectInput {
+  suggestions: [TimeFrameInput]
+  isDictated: Boolean
+}
+
+input TimeFrameInput {
+  startDate: String
+  endDate: String
 }

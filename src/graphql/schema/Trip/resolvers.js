@@ -1,44 +1,80 @@
-import { mergeProps, voters, creator } from '../resolver-helpers';
+import { users, voters, creator } from '../resolver-helpers';
 
 export default {
-  Query             : {
-    trip     : (_, { tripID }, { Trip }) => Trip.getOne(tripID),
-    allTrips : (_, __, { Trip }) => Trip.getAll()
+  Query: {
+    trip: (_, { id }, { Trip }) => Trip.findOne({ _id: id }),
+    allTrips: (_, __, { Trip }) => Trip.find()
   },
 
-  /* Mutation          : {
-    updateTrip : (_, { input: { id, ...update } }, { Trip }) => Trip.updateOne(id, update)
-  }, */
+  Mutation: {
+    createTrip: async (_, { trip, userID }, { Trip, User }) => {
+      const {
+        destination = { isDictated: false },
+        budget = { isDictated: false },
+        timeFrame = { isDictated: false },
+        participants
+      } = trip;
+      const matchedUsers = await User.find({ email: { $in: participants } });
+      const matchedEmails = matchedUsers.map((user) => user.email);
+      const newUsers = trip.participants.filter((email) => matchedEmails.indexOf(email) === -1);
+      const createdUsers = await User.create(newUsers.map((email) => ({ email })));
+      trip.participants = [ ...(matchedUsers || []), ...(createdUsers || []) ].map((user) => user.id);
+      if (destination.suggestions && destination.suggestions.length) {
+        destination.suggestions = destination.suggestions.map((name) => ({
+          name,
+          voters: [ userID ],
+          creator: userID
+        }));
+      }
+      if (budget.suggestions && budget.suggestions.length) {
+        budget.suggestions = budget.suggestions.map((value) => ({
+          value,
+          voters: [ userID ],
+          creator: userID
+        }));
+      }
+      if (timeFrame.suggestions && timeFrame.suggestions.length) {
+        timeFrame.suggestions = timeFrame.suggestions.map((object) => ({
+          ...object,
+          voters: [ userID ],
+          creator: userID
+        }));
+      }
+      trip['creator'] = userID;
+      return Trip.create({
+        ...trip,
+        destination,
+        budget,
+        timeFrame
+      });
+    }
+  },
 
-  Trip              : {
-    participants : (_, __, { User }) => Object.values(User.getAll()),
-    destination  : ({ id }, _, { Trip }) => Trip.getOne(id).destination
+  Trip: {
+    participants: ({ participants }, _, { User }) => users(participants, User),
+    creator
   },
-  DestinationObject : {
-    suggestions       : ({ suggestions }, _, { Destination }) =>
-      Object.keys(suggestions).map((key) => mergeProps(key, Destination.getOne, suggestions)),
-    chosenDestination : ({ chosenDestination, suggestions }, _, { Destination }) =>
-      chosenDestination ? mergeProps(chosenDestination, Destination.getOne, suggestions) : null
+  DestinationObject: {
+    chosenDestination: ({ chosenDestination, suggestions }) =>
+      suggestions.find((destination) => String(chosenDestination) === String(destination._id)) || null
   },
-  Destination       : {
+  Destination: {
     voters,
     creator
   },
-  BudgetObject      : {
-    suggestions  : ({ suggestions }) => Object.keys(suggestions).map((value) => suggestions[value]),
-    chosenBudget : ({ chosenBudget, suggestions }) =>
-      chosenBudget ? { value: chosenBudget, ...suggestions[chosenBudget] } : null
+  BudgetObject: {
+    chosenBudget: ({ chosenBudget, suggestions }) =>
+      chosenBudget || suggestions.find((budget) => chosenBudget === budget._id)
   },
-  Budget            : {
+  Budget: {
     voters,
     creator
   },
-  TimeFrameObject   : {
-    suggestions     : ({ suggestions }) => Object.keys(suggestions).map((value) => suggestions[value]),
-    chosenTimeFrame : ({ chosenTimeFrame, suggestions }) =>
-      chosenTimeFrame ? { value: chosenTimeFrame, ...suggestions[chosenTimeFrame] } : null
+  TimeFrameObject: {
+    chosenTimeFrame: ({ chosenTimeFrame, suggestions }) =>
+      chosenTimeFrame || suggestions.find((timeFrame) => chosenTimeFrame === timeFrame._id)
   },
-  TimeFrame         : {
+  TimeFrame: {
     voters,
     creator
   }

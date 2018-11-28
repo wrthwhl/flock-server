@@ -1,4 +1,19 @@
 {
-  "presets": [ "stage-3", [ "env", { "targets": { "node": "current" } } ] ],
-  "plugins": [ "import-graphql" ]
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "node": "current"
+        }
+      }
+    ]
+  ],
+  "plugins": [
+    "@babel/plugin-syntax-dynamic-import",
+    "@babel/plugin-syntax-import-meta",
+    [ "@babel/plugin-proposal-class-properties", { "loose": false } ],
+    "@babel/plugin-proposal-json-strings",
+    "import-graphql"
+  ]
 }
