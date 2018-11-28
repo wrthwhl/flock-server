@@ -3,18 +3,26 @@ extend type Query {
   allUsers: [User]!
 }
 
+# TODO refactor to take userid from auth token
 extend type Mutation {
-  updateUser(input: updateUserInput!): updateUser!,
+  updateUser(input: updateUserInput!): updateUser! # TODO put user id in separate argument e.g. updateUser(id: ID!, update: updateUserInput): User!
   createUser(input: createUserInput!): createUser!
 }
 
 type User {
   id: ID!
-  email: String
+  email: String!
   avatarURL: String
   firstName: String
   lastName: String
   trips: [Trip]
+}
+
+input UserInput {
+  email: String!
+  avatarURL: String
+  firstName: String
+  lastName: String
 }
 
 input updateUserInput {

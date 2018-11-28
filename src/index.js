@@ -1,9 +1,10 @@
-import config from '../config';
-import createServer from './graphql/server';
+import apollo from './graphql/server';
+import mongoose from './models';
 import * as models from './models';
+import config from '../config';
 
-const server = createServer({ context: models });
+apollo.launch({ context: models, playground: config.apollo.playground }, config.apollo.PORT);
 
-server.listen({ port: config.PORT || 4000 }).then(({ url }) => {
-  console.log(`✔️  GraphQL up and running, playground ready at ${url}`); // eslint-disable-line no-console
-});
+mongoose.launch(...config.mongoose);
+
+export { mongoose, apollo };

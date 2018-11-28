@@ -1,4 +1,4 @@
-import { mergeProps, voters, creator } from '../resolver-helpers';
+import { voters, creator } from '../resolver-helpers';
 
 
 export default {
@@ -9,57 +9,63 @@ export default {
 
   Mutation          : {
     updateTrip : (_, { input: { ...update } }, { Trip }) => Trip.findOneAndUpdate(update),
-    createTrip : async (_, {input, userID}, { Trip }) => {
-      input.destination.suggestions = input.destination.suggestions.map(name => ({
+    createTrip : async (_, { trip, userID }, { Trip, User }) => {
+      const { destination, budget, timeFrame, participants } = trip;
+      const matchedUsers = await User.find({ email: { $in: participants } });
+      const matchedEmails = matchedUsers.map((user) => user.email);
+      const newUsers = trip.participants.filter((email) => matchedEmails.indexOf(email) === -1);
+      const createdUsers = await User.create(newUsers.map((email) => ({ email })));
+      trip.participants = [ ...(matchedUsers || []), ...(createdUsers || []) ].map((user) => user.id);
+
+      destination.suggestions = destination.suggestions.map((name) => ({
         name,
-        voters: [userID],
-        creator: userID
+        voters  : [ userID ],
+        creator : userID
       }));
-      input.budget.suggestions = input.budget.suggestions.map(value => ({
+      budget.suggestions = budget.suggestions.map((value) => ({
         value,
-        voters: [userID],
-        creator: userID
+        voters  : [ userID ],
+        creator : userID
       }));
-      input.timeFrame.suggestions = input.timeFrame.suggestions.map(object => ({
+      timeFrame.suggestions = timeFrame.suggestions.map((object) => ({
         ...object,
-        voters: [userID],
-        creator: userID
+        voters  : [ userID ],
+        creator : userID
       }));
-      const res = await Trip.create(
-        input
-      );
-    
-      return res;
+      return Trip.create(trip);
+
     }
   },
 
   Trip              : {
+
     participants : (_, __, { User }) => Object.values(User.find()),
     destination  : ({ id }, _, { Trip }) => Trip.findOne(id).destination
+
   },
   DestinationObject : {
-    suggestions       : ({ suggestions }, _, { Destination }) =>
-      Object.keys(suggestions).map((key) => mergeProps(key, Destination.getOne, suggestions)),
-    chosenDestination : ({ chosenDestination, suggestions }, _, { Destination }) =>
-      chosenDestination ? mergeProps(chosenDestination, Destination.getOne, suggestions) : null
+    // suggestions       : ({ suggestions }, _, { Destination }) => suggestions
+    chosenDestination : ({ chosenDestination, suggestions }) =>
+      suggestions.find((destination) => String(chosenDestination) === String(destination._id)) || null
+    // chosenDestination ? mergeProps(chosenDestination, Destination.getOne, suggestions) : null
   },
   Destination       : {
     voters,
     creator
   },
   BudgetObject      : {
-    suggestions  : ({ suggestions }) => Object.keys(suggestions).map((value) => suggestions[value]),
+    // suggestions  : ({ suggestions }) => suggestions,
     chosenBudget : ({ chosenBudget, suggestions }) =>
-      chosenBudget ? { value: chosenBudget, ...suggestions[chosenBudget] } : null
+      chosenBudget || suggestions.find((budget) => chosenBudget === budget._id)
   },
   Budget            : {
     voters,
     creator
   },
   TimeFrameObject   : {
-    suggestions     : ({ suggestions }) => Object.keys(suggestions).map((value) => suggestions[value]),
+    // suggestions     : ({ suggestions }) => suggestions,
     chosenTimeFrame : ({ chosenTimeFrame, suggestions }) =>
-      chosenTimeFrame ? { value: chosenTimeFrame, ...suggestions[chosenTimeFrame] } : null
+      chosenTimeFrame || suggestions.find((timeFrame) => chosenTimeFrame === timeFrame._id)
   },
   TimeFrame         : {
     voters,

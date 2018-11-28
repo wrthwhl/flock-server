@@ -1,21 +1,19 @@
-import mongoose, { Schema } from 'mongoose';
-import data from '../data';
+import mongoose from 'mongoose';
+
+const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
-  id         : Number,
   firstName  : String,
   lastName   : String,
-  email      : String,
+  email      : { type: String, required: true },
   avatar_url : String
 });
 
 const User = mongoose.model('users', UserSchema);
 
-(async function() {
-  await User.deleteMany({});
-  data.users.forEach(async (user) => {
-    await User.create(user);
-  });
-})();
+/* // TODO remove
+import { getUsers } from '../../seeds/seedFunctions';
+const [ ...users ] = getUsers(10);
+User.create(users); */
 
 export default User;
