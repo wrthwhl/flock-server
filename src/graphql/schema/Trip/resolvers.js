@@ -8,6 +8,9 @@ export default {
 
   Mutation: {
     createTrip: async (_, { trip, userID }, { Trip, User }) => {
+      !trip.destination && (trip.destination = { isDictated: false });
+      !trip.budget && (trip.budget = { isDictated: false });
+      !trip.timeFrame && (trip.timeFrame = { isDictated: false });
       const { destination, budget, timeFrame, participants } = trip;
       const matchedUsers = await User.find({ email: { $in: participants } });
       const matchedEmails = matchedUsers.map((user) => user.email);
@@ -21,14 +24,14 @@ export default {
           creator: userID
         }));
       }
-      if (budget.suggestions && budget.suggestions.length) {
+      if (budget && budget.suggestions && budget.suggestions.length) {
         budget.suggestions = budget.suggestions.map((value) => ({
           value,
           voters: [ userID ],
           creator: userID
         }));
       }
-      if (timeFrame.suggestions && timeFrame.suggestions.length) {
+      if (timeFrame && timeFrame.suggestions && timeFrame.suggestions.length) {
         timeFrame.suggestions = timeFrame.suggestions.map((object) => ({
           ...object,
           voters: [ userID ],
