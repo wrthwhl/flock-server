@@ -3,7 +3,7 @@ import { voters, creator } from '../resolver-helpers';
 
 export default {
   Query             : {
-    trip     : (_, { id }, { Trip }) => Trip.findOne(id),
+    trip     : (_, { id }, { Trip }) => Trip.findOne({ _id: id }),
     allTrips : (_, __, { Trip }) => Trip.find()
   },
 
