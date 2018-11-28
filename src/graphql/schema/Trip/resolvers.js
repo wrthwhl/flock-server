@@ -8,7 +8,12 @@ export default {
 
   Mutation: {
     createTrip: async (_, { trip, userID }, { Trip, User }) => {
-      const { destination, budget, timeFrame, participants } = trip;
+      const {
+        destination = { isDictated: false },
+        budget = { isDictated: false },
+        timeFrame = { isDictated: false },
+        participants
+      } = trip;
       const matchedUsers = await User.find({ email: { $in: participants } });
       const matchedEmails = matchedUsers.map(user => user.email);
       const newUsers = trip.participants.filter(
@@ -43,7 +48,12 @@ export default {
         }));
       }
       trip['creator'] = userID;
-      return Trip.create(trip);
+      return Trip.create({
+        ...trip,
+        destination,
+        budget,
+        timeFrame
+      });
     }
     // addParticipant: (_, { tripID, email }, { Trip, User }) => {
     //   if (trip.id === id) {
@@ -56,22 +66,18 @@ export default {
   Trip: {
     participants: ({ participants }, _, { User }) => users(participants, User),
     creator
-    // destination  : ({ id }, _, { Trip }) => Trip.findOne(id)
   },
   DestinationObject: {
-    // suggestions       : ({ suggestions }, _, { Destination }) => suggestions
     chosenDestination: ({ chosenDestination, suggestions }) =>
       suggestions.find(
         destination => String(chosenDestination) === String(destination._id)
       ) || null
-    // chosenDestination ? mergeProps(chosenDestination, Destination.getOne, suggestions) : null
   },
   Destination: {
     voters,
     creator
   },
   BudgetObject: {
-    // suggestions  : ({ suggestions }) => suggestions,
     chosenBudget: ({ chosenBudget, suggestions }) =>
       chosenBudget || suggestions.find(budget => chosenBudget === budget._id)
   },
@@ -80,7 +86,6 @@ export default {
     creator
   },
   TimeFrameObject: {
-    // suggestions     : ({ suggestions }) => suggestions,
     chosenTimeFrame: ({ chosenTimeFrame, suggestions }) =>
       chosenTimeFrame ||
       suggestions.find(timeFrame => chosenTimeFrame === timeFrame._id)

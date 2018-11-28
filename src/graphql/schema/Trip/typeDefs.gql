@@ -5,7 +5,6 @@ extend type Query {
 
 extend type Mutation {
   createTrip(trip: TripInput!, userID: ID): Trip!
-  addParticipant(user: ID!): Trip!
 }
 
 type Trip {
