@@ -10,34 +10,47 @@ export default {
     createTrip: async (_, { trip, userID }, { Trip, User }) => {
       const { destination, budget, timeFrame, participants } = trip;
       const matchedUsers = await User.find({ email: { $in: participants } });
-      const matchedEmails = matchedUsers.map((user) => user.email);
-      const newUsers = trip.participants.filter((email) => matchedEmails.indexOf(email) === -1);
-      const createdUsers = await User.create(newUsers.map((email) => ({ email })));
-      trip.participants = [ ...(matchedUsers || []), ...(createdUsers || []) ].map((user) => user.id);
+      const matchedEmails = matchedUsers.map(user => user.email);
+      const newUsers = trip.participants.filter(
+        email => matchedEmails.indexOf(email) === -1
+      );
+      const createdUsers = await User.create(
+        newUsers.map(email => ({ email }))
+      );
+      trip.participants = [
+        ...(matchedUsers || []),
+        ...(createdUsers || [])
+      ].map(user => user.id);
       if (destination.suggestions && destination.suggestions.length) {
-        destination.suggestions = destination.suggestions.map((name) => ({
+        destination.suggestions = destination.suggestions.map(name => ({
           name,
-          voters: [ userID ],
+          voters: [userID],
           creator: userID
         }));
       }
       if (budget.suggestions && budget.suggestions.length) {
-        budget.suggestions = budget.suggestions.map((value) => ({
+        budget.suggestions = budget.suggestions.map(value => ({
           value,
-          voters: [ userID ],
+          voters: [userID],
           creator: userID
         }));
       }
       if (timeFrame.suggestions && timeFrame.suggestions.length) {
-        timeFrame.suggestions = timeFrame.suggestions.map((object) => ({
+        timeFrame.suggestions = timeFrame.suggestions.map(object => ({
           ...object,
-          voters: [ userID ],
+          voters: [userID],
           creator: userID
         }));
       }
       trip['creator'] = userID;
       return Trip.create(trip);
     }
+    // addParticipant: (_, { tripID, email }, { Trip, User }) => {
+    //   if (trip.id === id) {
+    //     const addParticipant = trip.participants.insert(participant);
+    //     return addParticipant;
+    //   }
+    // }
   },
 
   Trip: {
@@ -48,7 +61,9 @@ export default {
   DestinationObject: {
     // suggestions       : ({ suggestions }, _, { Destination }) => suggestions
     chosenDestination: ({ chosenDestination, suggestions }) =>
-      suggestions.find((destination) => String(chosenDestination) === String(destination._id)) || null
+      suggestions.find(
+        destination => String(chosenDestination) === String(destination._id)
+      ) || null
     // chosenDestination ? mergeProps(chosenDestination, Destination.getOne, suggestions) : null
   },
   Destination: {
@@ -58,7 +73,7 @@ export default {
   BudgetObject: {
     // suggestions  : ({ suggestions }) => suggestions,
     chosenBudget: ({ chosenBudget, suggestions }) =>
-      chosenBudget || suggestions.find((budget) => chosenBudget === budget._id)
+      chosenBudget || suggestions.find(budget => chosenBudget === budget._id)
   },
   Budget: {
     voters,
@@ -67,7 +82,8 @@ export default {
   TimeFrameObject: {
     // suggestions     : ({ suggestions }) => suggestions,
     chosenTimeFrame: ({ chosenTimeFrame, suggestions }) =>
-      chosenTimeFrame || suggestions.find((timeFrame) => chosenTimeFrame === timeFrame._id)
+      chosenTimeFrame ||
+      suggestions.find(timeFrame => chosenTimeFrame === timeFrame._id)
   },
   TimeFrame: {
     voters,

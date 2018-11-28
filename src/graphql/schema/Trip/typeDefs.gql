@@ -84,3 +84,7 @@ input TimeFrameInput {
   startDate: String
   endDate: String
 }
+
+input addParticipantInput {
+  participants: String
+}
