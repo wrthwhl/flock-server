@@ -6,9 +6,8 @@ import { getUsers } from './seedFunctions';
 module.exports = {
   usersOnly : async () => {
     mongoose.launch(...config.mongoose);
-    const [ ...users ] = getUsers(3);
-    const a = User.create(users);
-    console.log('a', a);
+    const [ ...users ] = getUsers(5);
+    User.create(users);
     // mongoose.close();
     return true;
   },

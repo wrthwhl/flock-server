@@ -4,8 +4,8 @@ extend type Query {
 }
 
 extend type Mutation {
-  createTrip(name: String!): updatedTrip!
-  updateTripp(id: ID!, trip: updateTripInput): Trip!
+  createTrip(trip: createTripInput!, userID: ID): Trip!
+  updateTrip(id: ID!, trip: updateTripInput): Trip!
   addParticipant(user: ID!): Trip!
   # updateTrip(input: updateTripInput!): updatedTrip!
   # createTrip(input: createTripInput!, userID: String): Trip

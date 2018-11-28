@@ -8,25 +8,30 @@ export default {
 
   Mutation          : {
     updateTrip : (_, { input: { ...update } }, { Trip }) => Trip.findOneAndUpdate(update),
-    createTrip : async (_, { input, userID }, { Trip }) => {
-      input.destination.suggestions = input.destination.suggestions.map((name) => ({
+    createTrip : async (_, { trip, userID }, { Trip, User }) => {
+      const { destination, budget, timeFrame, participants } = trip;
+      const matchedUsers = await User.find({ email: { $in: participants } });
+      const matchedEmails = matchedUsers.map((user) => user.email);
+      const newUsers = trip.participants.filter((email) => matchedEmails.indexOf(email) === -1);
+      const createdUsers = await User.create(newUsers.map((email) => ({ email })));
+      trip.participants = [ ...(matchedUsers || []), ...(createdUsers || []) ].map((user) => user.id);
+
+      destination.suggestions = destination.suggestions.map((name) => ({
         name,
         voters  : [ userID ],
         creator : userID
       }));
-      input.budget.suggestions = input.budget.suggestions.map((value) => ({
+      budget.suggestions = budget.suggestions.map((value) => ({
         value,
         voters  : [ userID ],
         creator : userID
       }));
-      input.timeFrame.suggestions = input.timeFrame.suggestions.map((object) => ({
+      timeFrame.suggestions = timeFrame.suggestions.map((object) => ({
         ...object,
         voters  : [ userID ],
         creator : userID
       }));
-      const res = await Trip.create(input);
-
-      return res;
+      return Trip.create(trip);
     }
   },
 
