@@ -2,7 +2,7 @@ import { ApolloServer } from 'apollo-server';
 import graphQlSchema from './schema';
 
 export default {
-  launch : (config = {}, port = 4000) => {
+  launch: (config = {}, port = 4000) => {
     const server = new ApolloServer({
       ...graphQlSchema,
       ...config

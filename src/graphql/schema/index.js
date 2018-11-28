@@ -9,7 +9,7 @@ import { typeDefs as Trip, resolvers as tripResolvers } from './Trip';
 
 export default {
   // Apollo Server accepts an array of type definitions 👍
-  typeDefs  : [ rootTypeDefs, User, Trip ],
+  typeDefs: [ rootTypeDefs, User, Trip ],
   // Since the resolvers are just objects, we can make do with a deep merge
-  resolvers : merge(rootResolvers, userResolvers, tripResolvers)
+  resolvers: merge(rootResolvers, userResolvers, tripResolvers)
 };
