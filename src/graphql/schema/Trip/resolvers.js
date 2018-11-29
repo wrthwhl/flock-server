@@ -1,4 +1,4 @@
-import { users, voters, creator } from '../resolver-helpers';
+import { users, voters, creator, buildSuggestionsObj, findUserOrCreate } from '../resolver-helpers';
 
 export default {
   Query: {
@@ -7,40 +7,19 @@ export default {
   },
 
   Mutation: {
-    createTrip: async (_, { trip, userID }, { Trip, User }) => {
+    createTrip: async (_, { trip }, { Trip, User, authToken }) => {
       const {
         destination = { isDictated: false },
         budget = { isDictated: false },
         timeFrame = { isDictated: false },
         participants
       } = trip;
-      const matchedUsers = await User.find({ email: { $in: participants } });
-      const matchedEmails = matchedUsers.map((user) => user.email);
-      const newUsers = trip.participants.filter((email) => matchedEmails.indexOf(email) === -1);
-      const createdUsers = await User.create(newUsers.map((email) => ({ email })));
-      trip.participants = [ ...(matchedUsers || []), ...(createdUsers || []) ].map((user) => user.id);
-      if (destination.suggestions && destination.suggestions.length) {
-        destination.suggestions = destination.suggestions.map((name) => ({
-          name,
-          voters: [ userID ],
-          creator: userID
-        }));
-      }
-      if (budget.suggestions && budget.suggestions.length) {
-        budget.suggestions = budget.suggestions.map((value) => ({
-          value,
-          voters: [ userID ],
-          creator: userID
-        }));
-      }
-      if (timeFrame.suggestions && timeFrame.suggestions.length) {
-        timeFrame.suggestions = timeFrame.suggestions.map((object) => ({
-          ...object,
-          voters: [ userID ],
-          creator: userID
-        }));
-      }
-      trip['creator'] = userID;
+      trip.participants = await findUserOrCreate(participants, User);
+      trip.participants = [ ...trip.participants, authToken ];
+      destination.suggestions = buildSuggestionsObj(destination, authToken);
+      budget.suggestions = buildSuggestionsObj(budget, authToken);
+      timeFrame.suggestions = buildSuggestionsObj(timeFrame, authToken);
+      trip['creator'] = authToken;
       return Trip.create({
         ...trip,
         destination,
