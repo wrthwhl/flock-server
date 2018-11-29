@@ -35,12 +35,15 @@ export default {
         timeFrame
       });
     },
-    addParticipant: async (_, { tripID, participants }, { Trip }) =>
-      await Trip.findOneAndUpdate(
+    addParticipant: async (_, { tripID, participants }, { Trip, User }) => {
+      participants = await findUserOrCreate(participants, User);
+      const participant = [
         { _id: tripID },
         { $addToSet: { participants: participants[0] } },
         { new: true }
-      )
+      ];
+      return Trip.findOneAndUpdate(...participant);
+    }
   },
 
   Trip: {
