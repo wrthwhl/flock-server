@@ -3,16 +3,12 @@ import { withFilter } from 'apollo-server';
 const { PubSub } = require('apollo-server');
 const pubsub = new PubSub();
 
-const TRIP_ADDED = 'TRIP_ADDED';
-
 export default {
   Subscription: {
     tripAdded: {
       subscribe: withFilter(
-        () => pubsub.asyncIterator(TRIP_ADDED),
+        () => pubsub.asyncIterator('TRIP_ADDED'),
         (payload, variables) => {
-          console.log('///////// PAYLOAD', payload);
-          console.log('///////// VARIABLES', variables);
           return payload.tripAdded.creator.toString() === variables.tripCreator;
         }
       )
@@ -66,7 +62,7 @@ export default {
         timeFrame
       });
 
-      pubsub.publish(TRIP_ADDED, { tripAdded: newTrip });
+      pubsub.publish('TRIP_ADDED', { tripAdded: newTrip });
       return newTrip;
     }
   },
