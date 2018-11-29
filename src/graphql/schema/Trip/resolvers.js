@@ -1,6 +1,16 @@
 import { users, voters, creator } from '../resolver-helpers';
+const { PubSub } = require('apollo-server');
+const pubsub = new PubSub();
+
+const TRIP_ADDED = 'TRIP_ADDED';
 
 export default {
+  Subscription: {
+    tripAdded: {
+      subscribe: () => pubsub.asyncIterator([ TRIP_ADDED ])
+    }
+  },
+
   Query: {
     trip: (_, { id }, { Trip }) => Trip.findOne({ _id: id }),
     allTrips: (_, __, { Trip }) => Trip.find()

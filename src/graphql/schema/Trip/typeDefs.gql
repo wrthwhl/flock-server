@@ -7,6 +7,10 @@ extend type Mutation {
   createTrip(trip: TripInput!, userID: ID): Trip!
 }
 
+extend type Subscription {
+  tripAdded: Trip
+}
+
 type Trip {
   id: ID!
   name: String!
