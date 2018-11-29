@@ -4,7 +4,7 @@ extend type Query {
 }
 
 extend type Mutation {
-  createTrip(trip: TripInput!, userID: ID): Trip!
+  createTrip(trip: TripInput!): Trip!
 }
 
 type Trip {
@@ -59,28 +59,36 @@ type TimeFrame {
 
 input TripInput {
   name: String!
-  participants: [String]
+  participants: [String]!
   destination: DestinationObjectInput
   budget: BudgetObjectInput
   timeFrame: TimeFrameObjectInput
 }
 
 input DestinationObjectInput {
-  suggestions: [String]
+  suggestions: [DestinationInput!]!
   isDictated: Boolean
+}
+
+input DestinationInput {
+  name: String!
 }
 
 input BudgetObjectInput {
-  suggestions: [Int]
+  suggestions: [BudgetInput!]!
   isDictated: Boolean
 }
 
+input BudgetInput {
+  value: Int!
+}
+
 input TimeFrameObjectInput {
-  suggestions: [TimeFrameInput]
+  suggestions: [TimeFrameInput!]!
   isDictated: Boolean
 }
 
 input TimeFrameInput {
-  startDate: String
-  endDate: String
+  startDate: Date!
+  endDate: Date!
 }
