@@ -6,13 +6,12 @@ const SECRET = 'SECRET'; // TODO put in config and inject into resolver context
 
 export default {
   Query: {
-    self: (_, __, { User, authToken }) => User.findOne({ _id: authToken }),
-    user: (_, { email }, { User }) => User.findOne({ email }), // TODO remove? cause: replaced by self
+    self: (_, __, { User, user: { email } }) => User.findOne({ email }),
     allUsers: (_, __, { User }) => User.find()
   },
 
   Mutation: {
-    update: (_, { id, update }, { User }) => User.findOneAndUpdate({ _id: id }, update),
+    updateUser: (_, { id, update }, { User }) => User.findOneAndUpdate({ _id: id }, update),
     register: async (_, { email, password, user }, { User }) => {
       password = await bcrypt.hash(password, 12);
       return User.create({ email, password, ...user });
@@ -25,16 +24,7 @@ export default {
       }
       if (!user || !valid) throw new AuthenticationError('');
       return jwt.sign({ email: user.email }, SECRET, { expiresIn: '185d' });
-    },
-
-    // TODO remove v, cause: deprecated
-    createUser: (_, { input: { firstName, lastName, email, avatar_url } }, { User }) =>
-      User.create({
-        firstName,
-        lastName,
-        email,
-        avatar_url
-      })
+    }
   },
 
   User: {

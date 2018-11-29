@@ -1,5 +1,6 @@
 import { ApolloServer } from 'apollo-server';
 import graphQlSchema from './schema';
+import jwt from 'jsonwebtoken';
 
 export default {
   launch: (models, config = {}, port = 4000) => {
@@ -7,8 +8,13 @@ export default {
       ...graphQlSchema,
       ...config,
       context: ({ req }) => {
-        const authToken = req.headers.authorization || '';
-        return { ...models, authToken };
+        const context = { ...models };
+        let authHeader = req.headers.authorization || '';
+        authHeader = authHeader.replace('Bearer ', '');
+        if (authHeader) {
+          context['user'] = jwt.decode(authHeader);
+        }
+        return context;
       }
     });
     server.listen({ port }).then(({ url }) => {
