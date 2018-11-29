@@ -1,20 +1,32 @@
-import { ApolloServer } from 'apollo-server';
+import { ApolloServer, AuthenticationError } from 'apollo-server';
 import graphQlSchema from './schema';
 import jwt from 'jsonwebtoken';
 
+const getJWTPayload = async ({ req, res }, SECRET) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return {};
+  const [ key, token ] = authHeader.split(' ');
+  try {
+    if (!key || !token || key.toUpperCase() !== 'BEARER') return res.status('401');
+    const user = await jwt.verify(token, SECRET);
+    return user;
+  } catch (err) {
+    res.status('401');
+    throw new AuthenticationError(
+      'Request contains invalid authorization header. Bearer token with valid JWT expected.',
+      err
+    );
+  }
+};
+
 export default {
-  launch: (models, config = {}, port = 4000) => {
+  launch: (models, apolloConfig = {}, port = 4000, SECRET) => {
     const server = new ApolloServer({
       ...graphQlSchema,
-      ...config,
-      context: ({ req }) => {
-        const context = { ...models };
-        let authHeader = req.headers.authorization || '';
-        authHeader = authHeader.replace('Bearer ', '');
-        if (authHeader) {
-          context['user'] = jwt.decode(authHeader);
-        }
-        return context;
+      ...apolloConfig,
+      context: async (ctx) => {
+        const user = await getJWTPayload(ctx, SECRET);
+        return { ...models, user };
       }
     });
     server
@@ -23,15 +35,3 @@ export default {
       .catch((err) => console.error(err)); // eslint-disable-line no-console
   }
 };
-
-/* ({ req }) => {
-  // get the user token from the headers
-  const token = req.headers.authorization || '';
-
-  // try to retrieve a user with the token
-  const user = getUser(token);
-
-  // add the user to the context
-  return { user };
-},
-}); */
