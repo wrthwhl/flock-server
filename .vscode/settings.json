@@ -8,7 +8,6 @@
   ],
   "prettier.openOutput": false,
   "prettier.tabWidth": 2,
-  "prettier.useTabs": false,
-  "prettier.alignObjectProperties": true
+  "prettier.useTabs": false
 
 }
