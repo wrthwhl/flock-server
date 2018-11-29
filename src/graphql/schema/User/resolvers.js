@@ -20,7 +20,7 @@ export default {
       const user = await User.findOne({ email });
       let valid = false;
       if (user) {
-        valid = bcrypt.compare(password, user.password);
+        valid = true === (await bcrypt.compare(password, user.password));
       }
       if (!user || !valid) throw new AuthenticationError('');
       return jwt.sign({ email: user.email }, SECRET, { expiresIn: '185d' });
