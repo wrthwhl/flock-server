@@ -52,7 +52,7 @@ export default {
     },
     addDestination: (_, { tripID, destination }, { Trip }) => {
       let suggestion = destination.suggestions;
-      let addSuggestion = [
+      let addDestinationSuggestion = [
         { _id: tripID },
         {
           $addToSet: {
@@ -61,7 +61,46 @@ export default {
         },
         { new: true }
       ];
-      return Trip.findOneAndUpdate(...addSuggestion);
+      return Trip.findOneAndUpdate(...addDestinationSuggestion);
+    },
+    addBudget: (_, { tripID, budget }, { Trip }) => {
+      let suggestion = budget.suggestions;
+      let addBudgetSuggestion = [
+        { _id: tripID },
+        {
+          $addToSet: {
+            'budget.suggestions': { $each: suggestion }
+          }
+        },
+        { new: true }
+      ];
+      return Trip.findOneAndUpdate(...addBudgetSuggestion);
+    },
+    addTimeFrame: (_, { tripID, timeFrame }, { Trip }) => {
+      let suggestion = timeFrame.suggestions;
+      console.log(suggestion);
+      let addTimeFrameSuggestion = [
+        { _id: tripID },
+        {
+          $addToSet: {
+            'timeFrame.suggestions': { $each: suggestion }
+          }
+        },
+        { new: true }
+      ];
+      return Trip.findOneAndUpdate(...addTimeFrameSuggestion);
+    },
+    removeBudget: (_, { tripID, budget }, { Trip }) => {
+      let suppression = budget.suggestions;
+      console.log(suppression);
+      let removeBudgetSuggestion = [
+        { _id: tripID },
+        {
+          $pull: suppression
+        },
+        { new: true }
+      ];
+      return Trip.findOneAndUpdate({ ...removeBudgetSuggestion });
     }
   },
 
