@@ -39,7 +39,11 @@ export default {
       participants = await findUserOrCreate(participants, User);
       const participant = [
         { _id: tripID },
-        { $addToSet: { participants: participants[0] } },
+        {
+          $addToSet: {
+            participants: { $each: participants }
+          }
+        },
         { new: true }
       ];
       return Trip.findOneAndUpdate(...participant);
