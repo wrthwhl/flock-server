@@ -54,13 +54,13 @@ export default {
         budget,
         timeFrame
       });
-    }
-    // addParticipant: (_, { tripID, email }, { Trip, User }) => {
-    //   if (trip.id === id) {
-    //     const addParticipant = trip.participants.insert(participant);
-    //     return addParticipant;
-    //   }
-    // }
+    },
+    addParticipant: async (_, { tripID, participants }, { Trip }) =>
+      await Trip.findOneAndUpdate(
+        { _id: tripID },
+        { $addToSet: { participants: participants[0] } },
+        { new: true }
+      )
   },
 
   Trip: {
