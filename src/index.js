@@ -3,7 +3,7 @@ import mongoose from './models';
 import * as models from './models';
 import config from '../config';
 
-apollo.launch({ context: models, playground: config.apollo.playground }, config.apollo.PORT);
+apollo.launch(models, config.apollo.playground, config.apollo.port);
 
 mongoose.launch(...config.mongoose);
 
