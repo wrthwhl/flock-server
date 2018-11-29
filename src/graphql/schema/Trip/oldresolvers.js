@@ -1,5 +1,4 @@
 import { users, voters, creator } from '../resolver-helpers';
-import { withFilter } from 'apollo-server';
 const { PubSub } = require('apollo-server');
 const pubsub = new PubSub();
 
@@ -8,14 +7,7 @@ const TRIP_ADDED = 'TRIP_ADDED';
 export default {
   Subscription: {
     tripAdded: {
-      subscribe: withFilter(
-        () => pubsub.asyncIterator(TRIP_ADDED),
-        (payload, variables) => {
-          console.log('///////// PAYLOAD', payload);
-          console.log('///////// VARIABLES', variables);
-          return payload.tripAdded.creator.toString() === variables.tripCreator;
-        }
-      )
+      subscribe: () => pubsub.asyncIterator([ TRIP_ADDED ])
     }
   },
 
@@ -59,7 +51,7 @@ export default {
         }));
       }
       trip['creator'] = userID;
-      const newTrip = await Trip.create({
+      const newTrip = Trip.create({
         ...trip,
         destination,
         budget,
