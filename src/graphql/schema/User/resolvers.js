@@ -6,7 +6,7 @@ const SECRET = 'SECRET'; // TODO put in config and inject into resolver context
 
 export default {
   Query: {
-    self: (_, __, { User, authToken }) => User.findOne({ _id: authToken }),
+    self: (_, __, { User, user: { email } }) => User.findOne({ email }),
     allUsers: (_, __, { User }) => User.find()
   },
 

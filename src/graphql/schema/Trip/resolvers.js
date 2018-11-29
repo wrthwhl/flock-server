@@ -1,4 +1,5 @@
 import { users, voters, creator, buildSuggestionsObj, findUserOrCreate } from '../resolver-helpers';
+import { AuthenticationError } from 'apollo-server';
 
 export default {
   Query: {
@@ -7,7 +8,9 @@ export default {
   },
 
   Mutation: {
-    createTrip: async (_, { trip }, { Trip, User, authToken }) => {
+    createTrip: async (_, { trip }, { Trip, User, user: { email } }) => {
+      const user = await User.findOne({ email });
+      if (!user) throw new AuthenticationError();
       const {
         destination = { isDictated: false },
         budget = { isDictated: false },
@@ -15,11 +18,11 @@ export default {
         participants
       } = trip;
       trip.participants = await findUserOrCreate(participants, User);
-      trip.participants = [ ...trip.participants, authToken ];
-      destination.suggestions = buildSuggestionsObj(destination, authToken);
-      budget.suggestions = buildSuggestionsObj(budget, authToken);
-      timeFrame.suggestions = buildSuggestionsObj(timeFrame, authToken);
-      trip['creator'] = authToken;
+      trip.participants = [ user._id, ...trip.participants ];
+      destination.suggestions = buildSuggestionsObj(destination, user._id);
+      budget.suggestions = buildSuggestionsObj(budget, user._id);
+      timeFrame.suggestions = buildSuggestionsObj(timeFrame, user._id);
+      trip['creator'] = user._id;
       return Trip.create({
         ...trip,
         destination,
