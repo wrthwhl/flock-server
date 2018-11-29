@@ -1,3 +1,4 @@
+
 import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 const ObjectID = mongoose.Schema.Types.ObjectId;
@@ -94,6 +95,7 @@ const Trip = mongoose.model('trips', TripSchema);
     }
   };
   await Trip.create(trip);
+
 })();
 
 export default Trip;
