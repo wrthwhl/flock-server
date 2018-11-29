@@ -17,3 +17,11 @@ export const buildSuggestionsObj = (dimension, authToken) => {
     }));
   }
 };
+
+export const findUserOrCreate = async (arrUsers, User) => {
+  const matchedUsers = await User.find({ email: { $in: arrUsers } });
+  const matchedEmails = matchedUsers.map((user) => user.email);
+  const newUsers = arrUsers.filter((email) => matchedEmails.indexOf(email) === -1);
+  const createdUsers = await User.create(newUsers.map((email) => ({ email })));
+  return [ ...(matchedUsers || []), ...(createdUsers || []) ].map((user) => user.id);
+};
