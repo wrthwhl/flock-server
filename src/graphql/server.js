@@ -17,9 +17,10 @@ export default {
         return context;
       }
     });
-    server.listen({ port }).then(({ url }) => {
-      console.log(`✔️  GraphQL up and running, playground ready at ${url}`); // eslint-disable-line no-console
-    });
+    server
+      .listen({ port })
+      .then(({ url }) => console.log(`✔️  GraphQL up and running, playground ready at ${url}`)) // eslint-disable-line no-console
+      .catch((err) => console.error(err)); // eslint-disable-line no-console
   }
 };
 
