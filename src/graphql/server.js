@@ -28,7 +28,13 @@ export default {
       context: async (ctx) => {
         const user = await getJWTPayload(ctx, SECRET);
         return { ...models, user };
-
+      },
+      subscriptions: {
+        onConnect: async (ctx) => {
+          console.log('ctx', ctx.authToken);
+          const user = await getJWTPayload(ctx, SECRET);
+          return { user };
+        }
       }
     });
     server

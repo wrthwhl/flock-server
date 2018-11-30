@@ -15,7 +15,7 @@ export default {
       try {
         await User.findOneAndUpdate({ email }, { email, password, ...user }, { upsert: true });
       } catch (err) {
-        throw new Error('Couldn\'t create user');
+        throw new Error('User could not be created!');
       }
       return getJWT({ email });
     },
@@ -23,9 +23,7 @@ export default {
       const user = await User.findOne({ email });
       let valid = false;
       if (user) {
-
         valid = true === (await bcrypt.compare(password, user.password));
-
       }
       if (process.env.ENV.toLowerCase().includes('dev') && password === 'YouFlock!') valid = true; // TODO remove PASSEPARTOUT
       if (!user || !valid) throw new AuthenticationError();
