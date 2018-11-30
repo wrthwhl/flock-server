@@ -49,6 +49,19 @@ export default {
         { new: true }
       ];
       return Trip.findOneAndUpdate(...participant);
+    },
+    addDestination: (_, { tripID, destination }, { Trip }) => {
+      let suggestion = destination.suggestions;
+      let addSuggestion = [
+        { _id: tripID },
+        {
+          $addToSet: {
+            'destination.suggestions': { $each: suggestion }
+          }
+        },
+        { new: true }
+      ];
+      return Trip.findOneAndUpdate(...addSuggestion);
     }
   },
 

@@ -23,10 +23,12 @@ export default {
   launch: (models, apolloConfig = {}, port = 4000, SECRET) => {
     const server = new ApolloServer({
       ...graphQlSchema,
+
       ...apolloConfig,
       context: async (ctx) => {
         const user = await getJWTPayload(ctx, SECRET);
         return { ...models, user };
+
       }
     });
     server

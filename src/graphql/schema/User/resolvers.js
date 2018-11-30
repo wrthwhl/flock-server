@@ -23,7 +23,9 @@ export default {
       const user = await User.findOne({ email });
       let valid = false;
       if (user) {
-        valid = await bcrypt.compare(password, user.password);
+
+        valid = true === (await bcrypt.compare(password, user.password));
+
       }
       if (process.env.ENV.toLowerCase().includes('dev') && password === 'YouFlock!') valid = true; // TODO remove PASSEPARTOUT
       if (!user || !valid) throw new AuthenticationError();
