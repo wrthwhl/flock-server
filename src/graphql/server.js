@@ -12,6 +12,7 @@ export default {
         let authHeader = req.headers.authorization || '';
         authHeader = authHeader.replace('Bearer ', '');
         if (authHeader) {
+          // TODO verify() necessary?
           context['user'] = jwt.decode(authHeader);
         }
         return context;
