@@ -1,13 +1,5 @@
-import {
-  users,
-  voters,
-  creator,
-  buildSuggestionsObj,
-  findUserOrCreate
-} from '../resolver-helpers';
-import { AuthenticationError } from 'apollo-server';
-import { withFilter } from 'apollo-server';
-const { PubSub } = require('apollo-server');
+import { users, voters, creator, buildSuggestionsObj, findUserOrCreate } from '../resolver-helpers';
+import { AuthenticationError, PubSub, withFilter } from 'apollo-server';
 const pubsub = new PubSub();
 
 export default {
@@ -17,9 +9,7 @@ export default {
         () => pubsub.asyncIterator('TRIPINFO_CHANGED'),
         async (payload, variables) => {
           const payloadResolved = await payload.tripInfoChanged;
-          return (
-            (await payloadResolved.creator.toString()) === variables.tripCreator
-          );
+          return (await payloadResolved.creator.toString()) === variables.tripCreator;
         }
       )
     }
@@ -42,7 +32,7 @@ export default {
       } = trip;
 
       trip.participants = await findUserOrCreate(participants, User);
-      trip.participants = [user._id, ...trip.participants];
+      trip.participants = [ user._id, ...trip.participants ];
       destination.suggestions = buildSuggestionsObj(destination, user._id);
       budget.suggestions = buildSuggestionsObj(budget, user._id);
       timeFrame.suggestions = buildSuggestionsObj(timeFrame, user._id);
@@ -95,9 +85,7 @@ export default {
   },
   DestinationObject: {
     chosenDestination: ({ chosenDestination, suggestions }) =>
-      suggestions.find(
-        destination => String(chosenDestination) === String(destination._id)
-      ) || null
+      suggestions.find((destination) => String(chosenDestination) === String(destination._id)) || null
   },
   Destination: {
     voters,
@@ -105,7 +93,7 @@ export default {
   },
   BudgetObject: {
     chosenBudget: ({ chosenBudget, suggestions }) =>
-      chosenBudget || suggestions.find(budget => chosenBudget === budget._id)
+      chosenBudget || suggestions.find((budget) => chosenBudget === budget._id)
   },
   Budget: {
     voters,
@@ -113,8 +101,7 @@ export default {
   },
   TimeFrameObject: {
     chosenTimeFrame: ({ chosenTimeFrame, suggestions }) =>
-      chosenTimeFrame ||
-      suggestions.find(timeFrame => chosenTimeFrame === timeFrame._id)
+      chosenTimeFrame || suggestions.find((timeFrame) => chosenTimeFrame === timeFrame._id)
   },
   TimeFrame: {
     voters,
