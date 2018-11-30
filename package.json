@@ -5,7 +5,9 @@
   "main": "index.js",
   "dependencies": {
     "apollo-server": "^2.2.2",
+    "bcrypt": "^3.0.2",
     "graphql": "^14.0.2",
+    "jsonwebtoken": "^8.4.0",
     "koa": "^2.6.2",
     "lodash.merge": "^4.6.1",
     "mongoose": "^5.3.13",
@@ -42,13 +44,20 @@
     "dev": "ENV=dev nodemon --exec babel-node src/index.js"
   },
   "lint-staged": {
-    "**/*.{js,jsx}": [ "eslint --fix", "git add" ]
+    "**/*.{js,jsx}": [
+      "eslint --fix",
+      "git add"
+    ]
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mrcknz/gtpe-server.git"
   },
-  "keywords": [ "graphql", "node", "apollo" ],
+  "keywords": [
+    "graphql",
+    "node",
+    "apollo"
+  ],
   "author": "Berta Cume, Christopher Bücklein, Damien Derail, Arturo Branco Moreira Pinto dos Santos, Marco Kunz",
   "license": "MIT",
   "bugs": {

@@ -1,12 +1,12 @@
 extend type Query {
-  user(id: ID!): User
   allUsers: [User]!
+  self: User!
 }
 
-# TODO refactor to take userid from auth token
 extend type Mutation {
-  updateUser(input: updateUserInput!): User # TODO put user id in separate argument e.g. updateUser(id: ID!, update: updateUserInput): User!
-  createUser(input: createUserInput!): User
+  register(email: String!, password: String!, user: UserInput): String
+  login(email: String!, password: String!): String
+  updateUser(id: ID!, update: updateUserInput): User!
 }
 
 type User {
@@ -18,14 +18,12 @@ type User {
 }
 
 input UserInput {
-  email: String!
   avatarURL: String
   firstName: String
   lastName: String
 }
 
 input updateUserInput {
-  id: ID!
   firstName: String
   lastName: String
   email: String
