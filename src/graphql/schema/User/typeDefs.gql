@@ -9,6 +9,10 @@ extend type Mutation {
   updateUser(id: ID!, update: updateUserInput): User!
 }
 
+extend type Subscription {
+  userUpdated(filteredEmail: String): User
+}
+
 type User {
   email: String!
   avatarURL: String

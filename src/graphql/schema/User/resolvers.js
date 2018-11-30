@@ -1,16 +1,33 @@
 import bcrypt from 'bcrypt';
 import { getJWT } from '../resolver-helpers';
 import { AuthenticationError } from 'apollo-server';
+const { PubSub, withFilter } = require('apollo-server');
+const pubsub = new PubSub();
+
+const USER_UPDATED = 'USER_UPDATED';
 
 export default {
+  Subscription: {
+    userUpdated: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(USER_UPDATED),
+        (payload, variables) => {
+          return payload.userUpdated.email === variables.filteredEmail;
+        }
+      )
+    }
+  },
   Query: {
     self: (_, __, { User, user: { email } }) => User.findOne({ email }),
     allUsers: (_, __, { User }) => User.find()
   },
 
   Mutation: {
-    updateUser: (_, { id, update }, { User }) =>
-      User.findOneAndUpdate({ _id: id }, update),
+    updateUser: async (_, { id, update }, { User }) => {
+      const updatedUser = await User.findOneAndUpdate({ _id: id }, update);
+      pubsub.publish(USER_UPDATED, { userUpdated: updatedUser });
+      return updatedUser;
+    },
     register: async (_, { email, password, user }, { User }) => {
       password = await bcrypt.hash(password, 12);
       try {

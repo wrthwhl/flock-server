@@ -9,6 +9,10 @@ extend type Mutation {
   addDestination(tripID: ID, destination: DestinationObjectInput!): Trip!
 }
 
+extend type Subscription {
+  tripAdded(tripCreator: ID!): Trip
+}
+
 type Trip {
   id: ID!
   name: String!
