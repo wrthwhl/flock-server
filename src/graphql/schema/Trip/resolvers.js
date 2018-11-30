@@ -12,11 +12,11 @@ const pubsub = new PubSub();
 
 export default {
   Subscription: {
-    tripAdded: {
+    tripInfoChanged: {
       subscribe: withFilter(
-        () => pubsub.asyncIterator('TRIP_ADDED'),
+        () => pubsub.asyncIterator('TRIPINFO_CHANGED'),
         async (payload, variables) => {
-          const payloadResolved = await payload.tripAdded;
+          const payloadResolved = await payload.tripInfoChanged;
           return (
             (await payloadResolved.creator.toString()) === variables.tripCreator
           );
@@ -54,7 +54,7 @@ export default {
         timeFrame
       });
 
-      pubsub.publish('TRIP_ADDED', { tripAdded: newTrip });
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
       return newTrip;
     },
     addParticipant: async (_, { tripID, participants }, { Trip, User }) => {
@@ -68,7 +68,9 @@ export default {
         },
         { new: true }
       ];
-      return Trip.findOneAndUpdate(...participant);
+      const newTrip = Trip.findOneAndUpdate(...participant);
+      pubsub.publish('TRIPINFO_CHANGED', { tripAdded: newTrip });
+      return newTrip;
     },
     addDestination: (_, { tripID, destination }, { Trip }) => {
       let suggestion = destination.suggestions;
@@ -81,7 +83,9 @@ export default {
         },
         { new: true }
       ];
-      return Trip.findOneAndUpdate(...addSuggestion);
+      const updatedTrip = Trip.findOneAndUpdate(...addSuggestion);
+      pubsub.publish('TRIPINFO_CHANGED', { tripAdded: updatedTrip });
+      return updatedTrip;
     }
   },
 
