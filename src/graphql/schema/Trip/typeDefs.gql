@@ -10,7 +10,7 @@ extend type Mutation {
 }
 
 extend type Subscription {
-  tripAdded(tripCreator: ID!): Trip
+  tripInfoChanged(tripCreator: ID!): Trip
 }
 
 type Trip {

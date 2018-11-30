@@ -32,6 +32,21 @@ export default {
           ? (user = await getJWTPayload(ctx, SECRET))
           : null;
         return { ...models, user };
+      },
+      subscriptions: {
+        onConnect: async connectionParams => {
+          const user = jwt.verify(connectionParams.authorization, SECRET);
+
+          if (user !== {})
+            return {
+              currentUser: jwt.verify(connectionParams.authorization, SECRET)
+            };
+          else {
+            throw new AuthenticationError(
+              'Request contains invalid authorization header. Bearer token with valid JWT expected.'
+            );
+          }
+        }
       }
     });
     server
