@@ -6,8 +6,25 @@ import {
   findUserOrCreate
 } from '../resolver-helpers';
 import { AuthenticationError } from 'apollo-server';
+import { withFilter } from 'apollo-server';
+const { PubSub } = require('apollo-server');
+const pubsub = new PubSub();
 
 export default {
+  Subscription: {
+    tripAdded: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator('TRIP_ADDED'),
+        async (payload, variables) => {
+          const payloadResolved = await payload.tripAdded;
+          return (
+            (await payloadResolved.creator.toString()) === variables.tripCreator
+          );
+        }
+      )
+    }
+  },
+
   Query: {
     trip: (_, { id }, { Trip }) => Trip.findOne({ _id: id }),
     allTrips: (_, __, { Trip }) => Trip.find()
@@ -30,12 +47,15 @@ export default {
       budget.suggestions = buildSuggestionsObj(budget, user._id);
       timeFrame.suggestions = buildSuggestionsObj(timeFrame, user._id);
       trip['creator'] = user._id;
-      return Trip.create({
+      const newTrip = Trip.create({
         ...trip,
         destination,
         budget,
         timeFrame
       });
+
+      pubsub.publish('TRIP_ADDED', { tripAdded: newTrip });
+      return newTrip;
     },
     addParticipant: async (_, { tripID, participants }, { Trip, User }) => {
       participants = await findUserOrCreate(participants, User);

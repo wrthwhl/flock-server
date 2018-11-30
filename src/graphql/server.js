@@ -26,7 +26,8 @@ export default {
 
       ...apolloConfig,
       context: async (ctx) => {
-        const user = await getJWTPayload(ctx, SECRET);
+        let user = null;
+        ctx && typeof ctx.req === 'object' ? (user = await getJWTPayload(ctx, SECRET)) : null;
         return { ...models, user };
       },
       subscriptions: {
