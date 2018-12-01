@@ -7,9 +7,11 @@ export default {
     tripInfoChanged: {
       subscribe: withFilter(
         () => pubsub.asyncIterator('TRIPINFO_CHANGED'),
-        async (payload, variables) => {
+        async (payload, variables, { User, user: { email } }) => {
+          const user = await User.findOne({ email });
           const payloadResolved = await payload.tripInfoChanged;
-          return (await payloadResolved.creator.toString()) === variables.tripCreator;
+          const participants = payloadResolved.participants.map((participant) => participant.toString());
+          return participants.includes(user._id.toString());
         }
       )
     }
