@@ -1,29 +1,50 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import { getJWT } from '../resolver-helpers';
 import { AuthenticationError } from 'apollo-server';
-
-const SECRET = 'SECRET'; // TODO put in config and inject into resolver context
+const { PubSub, withFilter } = require('apollo-server');
+const pubsub = new PubSub();
 
 export default {
+  Subscription: {
+    userUpdated: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator('USER_UPDATED'),
+        (payload, variables) => {
+          return payload.userUpdated.email === variables.filteredEmail;
+        }
+      )
+    }
+  },
   Query: {
     self: (_, __, { User, user: { email } }) => User.findOne({ email }),
     allUsers: (_, __, { User }) => User.find()
   },
 
   Mutation: {
-    updateUser: (_, { id, update }, { User }) => User.findOneAndUpdate({ _id: id }, update),
-    register: async (_, { email, password, user }, { User }) => {
+    updateUser: async (_, { id, update }, { User }) => {
+      const updatedUser = await User.findOneAndUpdate({ _id: id }, update);
+      pubsub.publish('USER_UPDATED', { userUpdated: updatedUser });
+      return updatedUser;
+    },
+    register: async (_, { email, password, user = {} }, { User }) => {
       password = await bcrypt.hash(password, 12);
-      return User.create({ email, password, ...user });
+      try {
+        const currentUser = await User.findOneAndUpdate({ email }, { email, password, ...user }, { upsert: true });
+        return getJWT({ _id: currentUser._id, email: currentUser.email });
+      } catch (err) {
+        console.error(err); // eslint-disable-line no-console
+        throw new Error('User could not be created!');
+      }
     },
     login: async (_, { email, password }, { User }) => {
       const user = await User.findOne({ email });
       let valid = false;
       if (user) {
-        valid = bcrypt.compare(password, user.password);
+        valid = true === (await bcrypt.compare(password, user.password));
       }
-      if (!user || !valid) throw new AuthenticationError('');
-      return jwt.sign({ email: user.email }, SECRET, { expiresIn: '185d' });
+      if (process.env.ENV.toLowerCase().includes('dev') && password === 'YouFlock!') valid = true; // TODO remove PASSEPARTOUT
+      if (!user || !valid) throw new AuthenticationError();
+      return await getJWT({ _id: user._id, email: user.email });
     }
   },
 

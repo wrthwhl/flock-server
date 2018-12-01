@@ -5,17 +5,59 @@ import {
   buildSuggestionsObj,
   findUserOrCreate
 } from '../resolver-helpers';
-import { AuthenticationError } from 'apollo-server';
+import { AuthenticationError, PubSub, withFilter } from 'apollo-server';
+import { addOrVoteForTimeFrame } from '../../../controllers/trip.controller';
+const pubsub = new PubSub();
 
 export default {
+  Subscription: {
+    tripInfoChanged: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator('TRIPINFO_CHANGED'),
+        async (payload, _, { User, user: { email } }) => {
+          const user = await User.findOne({ email });
+          const payloadResolved = await payload.tripInfoChanged;
+          const participants = payloadResolved.participants.map(participant =>
+            participant.toString()
+          );
+          return participants.includes(user._id.toString());
+        }
+      )
+    }
+  },
+
   Query: {
     trip: (_, { id }, { Trip }) => Trip.findOne({ _id: id }),
     allTrips: (_, __, { Trip }) => Trip.find()
   },
 
   Mutation: {
-    createTrip: async (_, { trip }, { Trip, User, user: { email } }) => {
+    addOrVoteForTimeFrame: async (
+      _,
+      { tripID, timeFrames },
+      { Trip, user }
+    ) => {
+      return addOrVoteForTimeFrame(tripID, timeFrames, user, Trip);
+    },
+    voteForDestination: async (
+      _,
+      { tripID, destinationID },
+      { Trip, User, user: { email } }
+    ) => {
       const user = await User.findOne({ email });
+      if (!user._id)
+        throw new AuthenticationError(
+          'No valid user found based on authorization token provided.'
+        );
+      return await Trip.findOneAndUpdate(
+        { _id: tripID, 'destination.suggestions._id': destinationID },
+        {
+          $addToSet: { 'destination.suggestions.$.voters': user._id }
+        },
+        { new: true }
+      );
+    },
+    createTrip: async (_, { trip }, { Trip, User, user }) => {
       if (!user) throw new AuthenticationError();
       const {
         destination = { isDictated: false },
@@ -26,16 +68,25 @@ export default {
 
       trip.participants = await findUserOrCreate(participants, User);
       trip.participants = [user._id, ...trip.participants];
-      destination.suggestions = buildSuggestionsObj(destination, user._id);
-      budget.suggestions = buildSuggestionsObj(budget, user._id);
-      timeFrame.suggestions = buildSuggestionsObj(timeFrame, user._id);
+      destination.suggestions = buildSuggestionsObj(
+        destination.suggestions,
+        user._id
+      );
+      budget.suggestions = buildSuggestionsObj(budget.suggestions, user._id);
+      timeFrame.suggestions = buildSuggestionsObj(
+        timeFrame.suggestions,
+        user._id
+      );
       trip['creator'] = user._id;
-      return Trip.create({
+      const newTrip = Trip.create({
         ...trip,
         destination,
         budget,
         timeFrame
       });
+
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
     },
     addParticipant: async (_, { tripID, participants }, { Trip, User }) => {
       participants = await findUserOrCreate(participants, User);
@@ -48,7 +99,9 @@ export default {
         },
         { new: true }
       ];
-      return Trip.findOneAndUpdate(...participant);
+      const newTrip = Trip.findOneAndUpdate(...participant);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
     },
     addDestination: async (_, { tripID, destination }, { Trip, user }) => {
       console.log(destination.suggestions);
@@ -123,6 +176,7 @@ export default {
         },
         { new: true }
       ];
+
       return Trip.findOneAndUpdate(...addBudgetSuggestion);
     },
     addTimeFrame: (_, { tripID, timeFrame }, { Trip }) => {
@@ -174,6 +228,9 @@ export default {
         { new: true }
       );
     }
+    // const updatedTrip = Trip.findOneAndUpdate(...addSuggestion);
+    // pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+    // return updatedTrip;
   },
 
   Trip: {

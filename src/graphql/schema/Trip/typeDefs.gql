@@ -5,6 +5,7 @@ extend type Query {
 
 extend type Mutation {
   createTrip(trip: TripInput!, userID: ID): Trip!
+
   addParticipant(tripID: ID, participants: [String]!): Trip!
   addDestination(tripID: ID, destination: DestinationObjectInput!): Trip!
   addVoterDestination(tripID: ID, destinationID: ID): Trip!
@@ -14,6 +15,13 @@ extend type Mutation {
   addVoterBudget(tripID: ID, budgetID: ID): Trip!
   removeVoterBudget(tripID: ID, budgetID: ID): Trip!
   removeBudget(tripID: ID, budget: BudgetObjectInput!): Trip!
+
+  voteForDestination(tripID: ID!, destinationID: ID!): Trip!
+  addOrVoteForTimeFrame(tripID: ID!, timeFrames: [TimeFrameInput!]!): [Trip]!
+}
+
+extend type Subscription {
+  tripInfoChanged: Trip
 }
 
 type Trip {
