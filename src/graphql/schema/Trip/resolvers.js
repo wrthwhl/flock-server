@@ -78,7 +78,11 @@ export default {
       const updatedTrip = Trip.findOneAndUpdate(...addSuggestion);
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
       return updatedTrip;
-    }
+    },
+
+    leaveTrip: () => {},
+
+    removeParticipants: () => {}
   },
 
   Trip: {
