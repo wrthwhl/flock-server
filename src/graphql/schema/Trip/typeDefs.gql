@@ -21,6 +21,7 @@ extend type Mutation {
 extend type Subscription {
   tripInfoChanged: Trip
   ownTripsChanged: [Trip]
+  userLeftTrip: User
 }
 
 type Trip {
