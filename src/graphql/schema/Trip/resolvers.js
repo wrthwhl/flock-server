@@ -94,7 +94,6 @@ export default {
       { tripID, destinationID },
       { Trip, User, user: { email } }
     ) => {
-      console.log(tripID, email, destinationID);
       const user = await User.findOne({ email });
       if (!user._id)
         throw new AuthenticationError(
@@ -113,7 +112,6 @@ export default {
       { tripID, destinationID },
       { Trip, User, user: { email } }
     ) => {
-      console.log(tripID, email, destinationID);
       const user = await User.findOne({ email });
       if (!user._id)
         throw new AuthenticationError(
