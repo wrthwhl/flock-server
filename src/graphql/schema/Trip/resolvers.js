@@ -78,7 +78,6 @@ export default {
     },
     addTimeFrame: (_, { tripID, timeFrame }, { Trip }) => {
       let suggestion = timeFrame.suggestions;
-      console.log(suggestion);
       let addTimeFrameSuggestion = [
         { _id: tripID },
         {
@@ -90,17 +89,43 @@ export default {
       ];
       return Trip.findOneAndUpdate(...addTimeFrameSuggestion);
     },
-    removeBudget: (_, { tripID, budget }, { Trip }) => {
-      let suppression = budget.suggestions;
-      console.log(suppression);
-      let removeBudgetSuggestion = [
-        { _id: tripID },
+    addVoters: async (
+      _,
+      { tripID, destinationID },
+      { Trip, User, user: { email } }
+    ) => {
+      console.log(tripID, email, destinationID);
+      const user = await User.findOne({ email });
+      if (!user._id)
+        throw new AuthenticationError(
+          'No valid user found based on authorization token provided.'
+        );
+      return await Trip.findOneAndUpdate(
+        { _id: tripID, 'destination.suggestions._id': destinationID },
         {
-          $pull: suppression
+          $addToSet: { 'destination.suggestions.$.voters': user._id }
         },
         { new: true }
-      ];
-      return Trip.findOneAndUpdate({ ...removeBudgetSuggestion });
+      );
+    },
+    removeVoters: async (
+      _,
+      { tripID, destinationID },
+      { Trip, User, user: { email } }
+    ) => {
+      console.log(tripID, email, destinationID);
+      const user = await User.findOne({ email });
+      if (!user._id)
+        throw new AuthenticationError(
+          'No valid user found based on authorization token provided.'
+        );
+      return await Trip.findOneAndUpdate(
+        { _id: tripID, 'destination.suggestions._id': destinationID },
+        {
+          $pull: { 'destination.suggestions.$.voters': user._id }
+        },
+        { new: true }
+      );
     }
   },
 

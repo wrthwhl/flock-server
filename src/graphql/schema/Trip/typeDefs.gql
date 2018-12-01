@@ -9,7 +9,9 @@ extend type Mutation {
   addDestination(tripID: ID, destination: DestinationObjectInput!): Trip!
   addBudget(tripID: ID, budget: BudgetObjectInput!): Trip!
   addTimeFrame(tripID: ID, timeFrame: TimeFrameObjectInput!): Trip!
+  addVoters(tripID: ID, destinationID: ID): Trip!
   removeBudget(tripID: ID, budget: BudgetObjectInput!): Trip!
+  removeVoters(tripID: ID, destinationID: ID): Trip!
 }
 
 type Trip {
