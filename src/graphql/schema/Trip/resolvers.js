@@ -199,6 +199,23 @@ export default {
       return allTrips;
     },
 
+    leaveTrip: async (_, { tripID }, { Trip, User, user: { email } }) => {
+      const userThatLeavesTrip = await User.findOne({ email });
+      console.log('///// USERLEAVESTRIP', userThatLeavesTrip);
+      const tripThatWillBeLeft = await Trip.findOne({ _id: tripID });
+      const newParticipants = tripThatWillBeLeft.participants.filter(
+        (potentialLeaver) =>
+          console.log(potentialLeaver, userThatLeavesTrip._id.toString()) ||
+          potentialLeaver._id.toString() !== userThatLeavesTrip._id.toString()
+      );
+      console.log('////// TRIPWILLBELEFT', newParticipants);
+      await Trip.findeOneAndUpdate({ _id: tripID }, { participants: newParticipants }, { new: true });
+      const allTrips = await Trip.find({ participants: userThatLeavesTrip._id });
+      console.log('///// ALLTRIPS', allTrips);
+      pubsub.publish('OWN_TRIPS_CHANGED', { ownTripsChanged: allTrips });
+      return allTrips;
+    },
+
     removeParticipants: () => {}
   },
 
