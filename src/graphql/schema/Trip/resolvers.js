@@ -1,13 +1,22 @@
-import {
-  users,
-  voters,
-  creator,
-  buildSuggestionsObj,
-  findUserOrCreate
-} from '../resolver-helpers';
-import { AuthenticationError } from 'apollo-server';
+import { users, voters, creator, buildSuggestionsObj, findUserOrCreate } from '../resolver-helpers';
+import { AuthenticationError, PubSub, withFilter } from 'apollo-server';
+const pubsub = new PubSub();
 
 export default {
+  Subscription: {
+    tripInfoChanged: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator('TRIPINFO_CHANGED'),
+        async (payload, variables, { User, user: { email } }) => {
+          const user = await User.findOne({ email });
+          const payloadResolved = await payload.tripInfoChanged;
+          const participants = payloadResolved.participants.map((participant) => participant.toString());
+          return participants.includes(user._id.toString());
+        }
+      )
+    }
+  },
+
   Query: {
     trip: (_, { id }, { Trip }) => Trip.findOne({ _id: id }),
     allTrips: (_, __, { Trip }) => Trip.find()
@@ -25,17 +34,20 @@ export default {
       } = trip;
 
       trip.participants = await findUserOrCreate(participants, User);
-      trip.participants = [user._id, ...trip.participants];
+      trip.participants = [ user._id, ...trip.participants ];
       destination.suggestions = buildSuggestionsObj(destination, user._id);
       budget.suggestions = buildSuggestionsObj(budget, user._id);
       timeFrame.suggestions = buildSuggestionsObj(timeFrame, user._id);
       trip['creator'] = user._id;
-      return Trip.create({
+      const newTrip = Trip.create({
         ...trip,
         destination,
         budget,
         timeFrame
       });
+
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
     },
     addParticipant: async (_, { tripID, participants }, { Trip, User }) => {
       participants = await findUserOrCreate(participants, User);
@@ -48,7 +60,9 @@ export default {
         },
         { new: true }
       ];
-      return Trip.findOneAndUpdate(...participant);
+      const newTrip = Trip.findOneAndUpdate(...participant);
+      pubsub.publish('TRIPINFO_CHANGED', { tripAdded: newTrip });
+      return newTrip;
     },
     addDestination: (_, { tripID, destination }, { Trip }) => {
       let suggestion = destination.suggestions;
@@ -61,7 +75,9 @@ export default {
         },
         { new: true }
       ];
-      return Trip.findOneAndUpdate(...addSuggestion);
+      const updatedTrip = Trip.findOneAndUpdate(...addSuggestion);
+      pubsub.publish('TRIPINFO_CHANGED', { tripAdded: updatedTrip });
+      return updatedTrip;
     }
   },
 
@@ -71,9 +87,7 @@ export default {
   },
   DestinationObject: {
     chosenDestination: ({ chosenDestination, suggestions }) =>
-      suggestions.find(
-        destination => String(chosenDestination) === String(destination._id)
-      ) || null
+      suggestions.find((destination) => String(chosenDestination) === String(destination._id)) || null
   },
   Destination: {
     voters,
@@ -81,7 +95,7 @@ export default {
   },
   BudgetObject: {
     chosenBudget: ({ chosenBudget, suggestions }) =>
-      chosenBudget || suggestions.find(budget => chosenBudget === budget._id)
+      chosenBudget || suggestions.find((budget) => chosenBudget === budget._id)
   },
   Budget: {
     voters,
@@ -89,8 +103,7 @@ export default {
   },
   TimeFrameObject: {
     chosenTimeFrame: ({ chosenTimeFrame, suggestions }) =>
-      chosenTimeFrame ||
-      suggestions.find(timeFrame => chosenTimeFrame === timeFrame._id)
+      chosenTimeFrame || suggestions.find((timeFrame) => chosenTimeFrame === timeFrame._id)
   },
   TimeFrame: {
     voters,
