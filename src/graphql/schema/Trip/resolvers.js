@@ -7,7 +7,7 @@ export default {
     tripInfoChanged: {
       subscribe: withFilter(
         () => pubsub.asyncIterator('TRIPINFO_CHANGED'),
-        async (payload, variables, { User, user: { email } }) => {
+        async (payload, _, { User, user: { email } }) => {
           const user = await User.findOne({ email });
           const payloadResolved = await payload.tripInfoChanged;
           const participants = payloadResolved.participants.map((participant) => participant.toString());
@@ -61,7 +61,7 @@ export default {
         { new: true }
       ];
       const newTrip = Trip.findOneAndUpdate(...participant);
-      pubsub.publish('TRIPINFO_CHANGED', { tripAdded: newTrip });
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
       return newTrip;
     },
     addDestination: (_, { tripID, destination }, { Trip }) => {
@@ -76,7 +76,7 @@ export default {
         { new: true }
       ];
       const updatedTrip = Trip.findOneAndUpdate(...addSuggestion);
-      pubsub.publish('TRIPINFO_CHANGED', { tripAdded: updatedTrip });
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
       return updatedTrip;
     }
   },
