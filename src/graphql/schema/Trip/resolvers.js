@@ -67,11 +67,10 @@ export default {
       } = trip;
 
       trip.participants = await findUserOrCreate(participants, User);
-      trip.participants = [user._id, ...trip.participants];
-      destination.suggestions = buildSuggestionsObj(
-        destination.suggestions,
-        user._id
-      );
+
+      trip.participants = [ ...new Set([ user._id, ...trip.participants ]) ];
+      destination.suggestions = buildSuggestionsObj(destination.suggestions, user._id);
+
       budget.suggestions = buildSuggestionsObj(budget.suggestions, user._id);
       timeFrame.suggestions = buildSuggestionsObj(
         timeFrame.suggestions,
@@ -84,7 +83,6 @@ export default {
         budget,
         timeFrame
       });
-
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
       return newTrip;
     },

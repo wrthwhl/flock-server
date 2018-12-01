@@ -27,6 +27,7 @@ export default {
       return updatedUser;
     },
     register: async (_, { email, password, user = {} }, { User }) => {
+      // TODO if email already exists do nothing!!!!!!
       password = await bcrypt.hash(password, 12);
       try {
         const currentUser = await User.findOneAndUpdate({ email }, { email, password, ...user }, { upsert: true });
