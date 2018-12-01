@@ -9,15 +9,10 @@ export default {
     userUpdated: {
       subscribe: withFilter(
         () => pubsub.asyncIterator('USER_UPDATED'),
-<<<<<<< HEAD
-        (payload, variables) => {
-          return payload.userUpdated.email === variables.filteredEmail;
-=======
         async (payload, variables, { User, user: { email } }) => {
           const user = await User.findOne({ email });
           const payloadResolved = await payload.userUpdated;
           return payloadResolved._id === user._id;
->>>>>>> build: Added userUpdated and leaveTrip
         }
       )
     }
@@ -55,10 +50,6 @@ export default {
         valid = true === (await bcrypt.compare(password, user.password));
         if (process.env.ENV.toLowerCase().includes('dev') && password === 'YouFlock!') valid = true; // TODO remove PASSEPARTOUT
       }
-<<<<<<< HEAD
-      if (!valid || !user) throw new AuthenticationError();
-      return await getJWT({ _id: user._id, email: user.email });
-=======
       if (process.env.ENV.toLowerCase().includes('dev') && password === 'YouFlock!') valid = true; // TODO remove PASSEPARTOUT
       if (!user || !valid) throw new AuthenticationError();
       return await getJWT({ email: user.email });
@@ -80,7 +71,6 @@ export default {
       }
       pubsub.publish('USER_UPDATED', { userLeftTrip: userThatLeavesTrip });
       return userThatLeavesTrip;
->>>>>>> build: Added userUpdated and leaveTrip
     }
   },
 
