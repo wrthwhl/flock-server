@@ -103,30 +103,30 @@ export default {
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
       return newTrip;
     },
-    addDestination: async (_, { tripID, destination }, { Trip, user }) => {
-      console.log(destination.suggestions);
-      console.log(user);
-      // destination = buildSuggestionsObj(destination, user._id);
-      console.log(destination);
+    addOrVoteForDestination: async (
+      _,
+      { tripID, destination },
+      { Trip, user }
+    ) => {
       let dest = await Trip.findOneAndUpdate(
         {
           _id: tripID,
           'destination.suggestions.name': destination.suggestions[0].name
         },
-        { $push: { 'destination.suggestions.$.voters': user._id } },
+        { $addToSet: { 'destination.suggestions.$.voters': user._id } },
         { new: true }
       );
-      console.log(dest);
+
       if (!dest) {
         dest = Trip.findOneAndUpdate(
           {
             _id: tripID
           },
-          { $addToSet: { 'destination.suggestions': destination.suggestions } },
+          { $push: { 'destination.suggestions': destination.suggestions } },
           { new: true }
         );
-        return dest;
       }
+      return dest;
     },
 
     addVoterDestination: async (

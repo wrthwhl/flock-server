@@ -7,7 +7,10 @@ extend type Mutation {
   createTrip(trip: TripInput!, userID: ID): Trip!
 
   addParticipant(tripID: ID, participants: [String]!): Trip!
-  addDestination(tripID: ID, destination: DestinationObjectInput!): Trip!
+  addOrVoteForDestination(
+    tripID: ID
+    destination: DestinationObjectInput!
+  ): Trip!
   addVoterDestination(tripID: ID, destinationID: ID): Trip!
   removeVoterDestination(tripID: ID, destinationID: ID): Trip!
   addTimeFrame(tripID: ID, timeFrame: TimeFrameObjectInput!): Trip!
