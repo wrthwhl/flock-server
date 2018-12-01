@@ -27,7 +27,6 @@ export default {
       context: async ({ req, res, connection }) => {
         let user = {};
         if (connection) {
-          console.log('connection.context', connection.context);
           user = typeof connection.context.user === 'object' ? connection.context.user : {};
         } else {
           user = await getJWTPayload(req.headers, SECRET, res);
@@ -37,7 +36,6 @@ export default {
       subscriptions: {
         onConnect: async (headers) => {
           const user = await getJWTPayload(headers, SECRET);
-          console.log('user', user);
           return { user };
         }
       }
