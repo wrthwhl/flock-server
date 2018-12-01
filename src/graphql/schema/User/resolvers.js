@@ -4,13 +4,11 @@ import { AuthenticationError } from 'apollo-server';
 const { PubSub, withFilter } = require('apollo-server');
 const pubsub = new PubSub();
 
-const USER_UPDATED = 'USER_UPDATED';
-
 export default {
   Subscription: {
     userUpdated: {
       subscribe: withFilter(
-        () => pubsub.asyncIterator(USER_UPDATED),
+        () => pubsub.asyncIterator('USER_UPDATED'),
         (payload, variables) => {
           return payload.userUpdated.email === variables.filteredEmail;
         }
@@ -25,7 +23,7 @@ export default {
   Mutation: {
     updateUser: async (_, { id, update }, { User }) => {
       const updatedUser = await User.findOneAndUpdate({ _id: id }, update);
-      pubsub.publish(USER_UPDATED, { userUpdated: updatedUser });
+      pubsub.publish('USER_UPDATED', { userUpdated: updatedUser });
       return updatedUser;
     },
     register: async (_, { email, password, user = {} }, { User }) => {
