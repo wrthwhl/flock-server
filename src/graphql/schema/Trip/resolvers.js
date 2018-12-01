@@ -72,7 +72,26 @@ export default {
       const newTrip = removeVoteForBudget(tripID, budgetID, user, Trip);
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
       return newTrip;
-    }
+    },
+    addDestination: (_, { tripID, destination }, { Trip }) => {
+      let suggestion = destination.suggestions;
+      let addSuggestion = [
+        { _id: tripID },
+        {
+          $addToSet: {
+            'destination.suggestions': { $each: suggestion }
+          }
+        },
+        { new: true }
+      ];
+      const updatedTrip = Trip.findOneAndUpdate(...addSuggestion);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
+    },
+
+    leaveTrip: () => {},
+
+    removeParticipants: () => {}
   },
 
   Trip: {
