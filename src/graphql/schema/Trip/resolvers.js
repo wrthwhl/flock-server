@@ -1,5 +1,6 @@
 import { users, voters, creator, buildSuggestionsObj, findUserOrCreate } from '../resolver-helpers';
 import { AuthenticationError, PubSub, withFilter } from 'apollo-server';
+import { addOrVoteForTimeFrame } from '../../../controllers/trip.controller';
 const pubsub = new PubSub();
 
 export default {
@@ -23,8 +24,21 @@ export default {
   },
 
   Mutation: {
-    createTrip: async (_, { trip }, { Trip, User, user: { email } }) => {
+    addOrVoteForTimeFrame: async (_, { tripID, timeFrames }, { Trip, user }) => {
+      return addOrVoteForTimeFrame(tripID, timeFrames, user, Trip);
+    },
+    voteForDestination: async (_, { tripID, destinationID }, { Trip, User, user: { email } }) => {
       const user = await User.findOne({ email });
+      if (!user._id) throw new AuthenticationError('No valid user found based on authorization token provided.');
+      return await Trip.findOneAndUpdate(
+        { _id: tripID, 'destination.suggestions._id': destinationID },
+        {
+          $addToSet: { 'destination.suggestions.$.voters': user._id }
+        },
+        { new: true }
+      );
+    },
+    createTrip: async (_, { trip }, { Trip, User, user }) => {
       if (!user) throw new AuthenticationError();
       const {
         destination = { isDictated: false },
@@ -35,9 +49,9 @@ export default {
 
       trip.participants = await findUserOrCreate(participants, User);
       trip.participants = [ user._id, ...trip.participants ];
-      destination.suggestions = buildSuggestionsObj(destination, user._id);
-      budget.suggestions = buildSuggestionsObj(budget, user._id);
-      timeFrame.suggestions = buildSuggestionsObj(timeFrame, user._id);
+      destination.suggestions = buildSuggestionsObj(destination.suggestions, user._id);
+      budget.suggestions = buildSuggestionsObj(budget.suggestions, user._id);
+      timeFrame.suggestions = buildSuggestionsObj(timeFrame.suggestions, user._id);
       trip['creator'] = user._id;
       const newTrip = Trip.create({
         ...trip,
