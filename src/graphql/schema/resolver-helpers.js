@@ -13,16 +13,16 @@ export const voters = ({ voters }, _, { User }) => users(voters, User);
 
 export const creator = ({ creator }, _, { User }) => User.findOne(creator);
 
-export const buildSuggestionsObj = (dimension, userID) => {
-  if (dimension.suggestions && dimension.suggestions.length) {
-    dimension.suggestions = dimension.suggestions.map((suggestion) => ({
+export const buildSuggestionsObj = (suggestions, userID) => {
+  if (suggestions.length) {
+    suggestions = suggestions.map((suggestion) => ({
       ...suggestion,
       voters: [ userID ],
 
       creator: userID
     }));
   }
-  return dimension.suggestions;
+  return suggestions;
 };
 
 export const findUserOrCreate = async (arrUsers, User) => {

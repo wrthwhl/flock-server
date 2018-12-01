@@ -4,13 +4,11 @@ import { AuthenticationError } from 'apollo-server';
 const { PubSub, withFilter } = require('apollo-server');
 const pubsub = new PubSub();
 
-const USER_UPDATED = 'USER_UPDATED';
-
 export default {
   Subscription: {
     userUpdated: {
       subscribe: withFilter(
-        () => pubsub.asyncIterator(USER_UPDATED),
+        () => pubsub.asyncIterator('USER_UPDATED'),
         (payload, variables) => {
           return payload.userUpdated.email === variables.filteredEmail;
         }
@@ -25,17 +23,18 @@ export default {
   Mutation: {
     updateUser: async (_, { id, update }, { User }) => {
       const updatedUser = await User.findOneAndUpdate({ _id: id }, update);
-      pubsub.publish(USER_UPDATED, { userUpdated: updatedUser });
+      pubsub.publish('USER_UPDATED', { userUpdated: updatedUser });
       return updatedUser;
     },
-    register: async (_, { email, password, user }, { User }) => {
+    register: async (_, { email, password, user = {} }, { User }) => {
       password = await bcrypt.hash(password, 12);
       try {
-        await User.findOneAndUpdate({ email }, { email, password, ...user }, { upsert: true });
+        const currentUser = await User.findOneAndUpdate({ email }, { email, password, ...user }, { upsert: true });
+        return getJWT({ _id: currentUser._id, email: currentUser.email });
       } catch (err) {
+        console.error(err); // eslint-disable-line no-console
         throw new Error('User could not be created!');
       }
-      return getJWT({ email });
     },
     login: async (_, { email, password }, { User }) => {
       const user = await User.findOne({ email });
@@ -45,7 +44,7 @@ export default {
       }
       if (process.env.ENV.toLowerCase().includes('dev') && password === 'YouFlock!') valid = true; // TODO remove PASSEPARTOUT
       if (!user || !valid) throw new AuthenticationError();
-      return await getJWT({ email: user.email });
+      return await getJWT({ _id: user._id, email: user.email });
     }
   },
 
