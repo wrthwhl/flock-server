@@ -227,6 +227,25 @@ export default {
         },
         { new: true }
       );
+    },
+    removeParticipant: async (
+      _,
+      { tripID, ParticipantID },
+      { Trip, User, user: { email } }
+    ) => {
+      const user = await User.findOne({ email });
+      if (!user._id)
+        throw new AuthenticationError(
+          'No valid user found based on authorization token provided.'
+        );
+
+      return await Trip.findOneAndUpdate(
+        { _id: tripID },
+        {
+          $pull: { participants: ParticipantID }
+        },
+        { new: true }
+      );
     }
     // const updatedTrip = Trip.findOneAndUpdate(...addSuggestion);
     // pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });

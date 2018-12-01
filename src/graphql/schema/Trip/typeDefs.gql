@@ -18,7 +18,7 @@ extend type Mutation {
   addVoterBudget(tripID: ID, budgetID: ID): Trip!
   removeVoterBudget(tripID: ID, budgetID: ID): Trip!
   removeBudget(tripID: ID, budget: BudgetObjectInput!): Trip!
-
+  removeParticipant(tripID: ID, ParticipantID: ID): Trip!
   voteForDestination(tripID: ID!, destinationID: ID!): Trip!
   addOrVoteForTimeFrame(tripID: ID!, timeFrames: [TimeFrameInput!]!): [Trip]!
 }
