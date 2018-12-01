@@ -143,7 +143,6 @@ export default {
         },
         { new: true }
       ];
-<<<<<<< HEAD
 
       return Trip.findOneAndUpdate(...addBudgetSuggestion);
     },
@@ -201,12 +200,6 @@ export default {
     },
 
     removeParticipants: () => {}
-=======
-      const updatedTrip = Trip.findOneAndUpdate(...addSuggestion);
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
-      return updatedTrip;
-    }
->>>>>>> build: Working subscriptions for all trip mutations
   },
 
   Trip: {
