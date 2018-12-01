@@ -5,8 +5,20 @@ extend type Query {
 
 extend type Mutation {
   createTrip(trip: TripInput!, userID: ID): Trip!
-  addParticipant(tripID: ID!, participants: [String!]!): Trip!
-  addDestination(tripID: ID!, destination: DestinationObjectInput!): Trip!
+
+  addParticipant(tripID: ID, participants: [String]!): Trip!
+  addOrVoteForDestination(
+    tripID: ID
+    destination: DestinationObjectInput!
+  ): Trip!
+  addVoterDestination(tripID: ID, destinationID: ID): Trip!
+  removeVoterDestination(tripID: ID, destinationID: ID): Trip!
+  addTimeFrame(tripID: ID, timeFrame: TimeFrameObjectInput!): Trip!
+  addBudget(tripID: ID, budget: BudgetObjectInput!): Trip!
+  addVoterBudget(tripID: ID, budgetID: ID): Trip!
+  removeVoterBudget(tripID: ID, budgetID: ID): Trip!
+  removeBudget(tripID: ID, budget: BudgetObjectInput!): Trip!
+
   voteForDestination(tripID: ID!, destinationID: ID!): Trip!
   addOrVoteForTimeFrame(tripID: ID!, timeFrames: [TimeFrameInput!]!): [Trip]!
 }
