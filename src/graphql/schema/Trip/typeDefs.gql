@@ -12,10 +12,15 @@ extend type Mutation {
   removeVoteForDestination(tripID: ID!, destinationID: ID!): Trip!
   removeVoteForTimeFrame(tripID: ID!, timeFrameID: ID!): Trip!
   removeVoteForBudget(tripID: ID!, budgetID: ID!): Trip!
+  addParticipant(tripID: ID, participants: [String]!): Trip!
+  addDestination(tripID: ID, destination: DestinationObjectInput!): Trip!
+  leaveTrip(tripID: ID): User!
+  removeParticipants(tripID: ID, participants: [String]): Trip!
 }
 
 extend type Subscription {
   tripInfoChanged: Trip
+  userLeftTrip: User
 }
 
 type Trip {

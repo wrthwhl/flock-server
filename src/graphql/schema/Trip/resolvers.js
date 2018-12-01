@@ -89,8 +89,6 @@ export default {
       return updatedTrip;
     },
 
-    leaveTrip: () => {},
-
     removeParticipants: () => {}
   },
 
