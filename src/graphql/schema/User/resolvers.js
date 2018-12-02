@@ -29,12 +29,12 @@ export default {
       pubsub.publish('USER_UPDATED', { userUpdated: updatedUser });
       return updatedUser;
     },
-    register: async (_, { email, password, user: userInput = {} }, { User, user }) => {
-      const currentUser = User.findOne({ email: user.email, _id: user._id });
+    register: async (_, { email, password, user: userInput = {} }, { User }) => {
+      let currentUser = await User.findOne({ email });
       if (currentUser) throw new Error('User already exists. Try login instead!');
       password = await bcrypt.hash(password, 12);
       try {
-        const currentUser = await User.findOneAndUpdate({ email }, { email, password, ...userInput }, { upsert: true });
+        currentUser = await User.create({ email, password, ...userInput });
         return getJWT({ _id: currentUser._id, email: currentUser.email });
       } catch (err) {
         console.error(err); // eslint-disable-line no-console
@@ -46,9 +46,9 @@ export default {
       let valid = false;
       if (user) {
         valid = true === (await bcrypt.compare(password, user.password));
+        if (process.env.ENV.toLowerCase().includes('dev') && password === 'YouFlock!') valid = true; // TODO remove PASSEPARTOUT
       }
-      if (process.env.ENV.toLowerCase().includes('dev') && password === 'YouFlock!') valid = true; // TODO remove PASSEPARTOUT
-      if (!user || !valid) throw new AuthenticationError();
+      if (!valid || !user) throw new AuthenticationError();
       return await getJWT({ _id: user._id, email: user.email });
     }
   },
