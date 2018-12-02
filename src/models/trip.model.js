@@ -33,7 +33,7 @@ const TripSchema = new Schema({
   },
   budget: {
     isDictated: Boolean,
-    choosenBudget: ObjectID,
+    chosenBudget: ObjectID,
     suggestions: [ BudgetSchema ]
   },
   timeFrame: {
@@ -60,7 +60,6 @@ const Trip = mongoose.model('trips', TripSchema);
     creator: '000000000000000000000000',
     destination: {
       isDictated: false,
-      chosenDestination: '000000000000000000000000',
       suggestions: [
         {
           _id: '000000000000000000000000',
@@ -72,7 +71,6 @@ const Trip = mongoose.model('trips', TripSchema);
     },
     budget: {
       isDictated: false,
-      chosenDestination: null,
       suggestions: [
         {
           value: 500,
@@ -83,9 +81,10 @@ const Trip = mongoose.model('trips', TripSchema);
     },
     timeFrame: {
       isDictated: true,
-      chosenDestination: null,
+      chosenTimeFrame: '000000000000000000000000',
       suggestions: [
         {
+          _id: '000000000000000000000000',
           startDate: '2018-12-16',
           endDate: '2018-12-23',
           voters: [ '111111111111111111111111', '444444444444444444444444' ],

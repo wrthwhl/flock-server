@@ -26,13 +26,21 @@ export const createTrip = async (trip, user, { Trip, User }) => {
   budget.suggestions = buildSuggestionsObj(budget.suggestions, user._id);
   timeFrame.suggestions = buildSuggestionsObj(timeFrame.suggestions, user._id);
   trip['creator'] = user._id;
-  const newTrip = Trip.create({
+  let newTrip = await Trip.create({
     ...trip,
     participants,
     destination,
     budget,
     timeFrame
   });
+  if (destination.isDictated || timeFrame.isDictated || budget.isDictated) {
+    const update = {};
+    if (destination.isDictated) update['destination.chosenDestination'] = newTrip.destination.suggestions[0]._id;
+    if (timeFrame.isDictated) update['timeFrame.chosenTimeFrame'] = newTrip.timeFrame.suggestions[0]._id;
+    if (budget.isDictated) update['budget.chosenBudget'] = newTrip.budget.suggestions[0]._id;
+    newTrip = await Trip.findOneAndUpdate({ _id: newTrip._id }, update, { new: true });
+  }
+
   pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
   return newTrip;
 };

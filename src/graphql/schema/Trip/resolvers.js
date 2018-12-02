@@ -85,7 +85,7 @@ export default {
   },
   DestinationObject: {
     chosenDestination: ({ chosenDestination, suggestions }) =>
-      suggestions.find((destination) => String(chosenDestination) === String(destination._id)) || null
+      chosenDestination && suggestions.find((destination) => String(chosenDestination) === String(destination._id))
   },
   Destination: {
     voters,
@@ -93,7 +93,7 @@ export default {
   },
   BudgetObject: {
     chosenBudget: ({ chosenBudget, suggestions }) =>
-      chosenBudget || suggestions.find((budget) => chosenBudget === budget._id)
+      chosenBudget && suggestions.find((budget) => String(chosenBudget) === String(budget._id))
   },
   Budget: {
     voters,
@@ -101,7 +101,7 @@ export default {
   },
   TimeFrameObject: {
     chosenTimeFrame: ({ chosenTimeFrame, suggestions }) =>
-      chosenTimeFrame || suggestions.find((timeFrame) => chosenTimeFrame === timeFrame._id)
+      chosenTimeFrame && suggestions.find((timeFrame) => String(chosenTimeFrame) === String(timeFrame._id))
   },
   TimeFrame: {
     voters,
