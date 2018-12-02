@@ -3,6 +3,7 @@ import { getJWT } from '../resolver-helpers';
 import { AuthenticationError } from 'apollo-server';
 const { PubSub, withFilter } = require('apollo-server');
 const pubsub = new PubSub();
+const fetch = require('node-fetch');
 
 export default {
   Subscription: {
@@ -34,6 +35,30 @@ export default {
       } catch (err) {
         console.error(err); // eslint-disable-line no-console
         throw new Error('User could not be created!');
+      }
+    },
+    facebook: async (_, { email, accessToken, userID, user = {} }, { User }) => {
+      //this should be an enviromental variable but will be kept here for now for checking
+      const serverAccessToken = '295087824459443|ierZVxTgM2AUv0aBDR4j2jCLeno'
+      const uri = `https://graph.facebook.com/debug_token?input_token=${accessToken}&access_token=${serverAccessToken}`;
+      let verification = await fetch (uri);
+      let verificationResponse = await verification.json();
+      if (verificationResponse.data.is_valid && verificationResponse.data.user_id === userID) {
+        const user = await User.findOne({ email });
+        console.log(user);
+        if (user) return getJWT({ _id: user._id, email: user.email });
+        console.log('here');
+        try {
+          const currentUser = await User.findOneAndUpdate({ email }, { email, ...user }, { upsert: true });
+          return getJWT({ _id: currentUser._id, email: currentUser.email });
+        } catch (err) {
+          console.error(err); // eslint-disable-line no-console
+          throw new Error('User could not be created!');
+        }
+      }
+      else {
+        console.log('eeeee')
+       throw new AuthenticationError();
       }
     },
     login: async (_, { email, password }, { User }) => {
