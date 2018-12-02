@@ -29,7 +29,7 @@ export default {
     register: async (_, { email, password, user = {} }, { User }) => {
       password = await bcrypt.hash(password, 12);
       try {
-        const currentUser = await User.findOneAndUpdate({ email }, { email, password, ...user }, { upsert: true });
+        const currentUser = await User.findOneAndUpdate({ email }, { email, password, ...user }, { upsert: true, new : true });
         return getJWT({ _id: currentUser._id, email: currentUser.email });
       } catch (err) {
         console.error(err); // eslint-disable-line no-console
