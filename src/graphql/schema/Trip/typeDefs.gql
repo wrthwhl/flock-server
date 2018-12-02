@@ -26,6 +26,7 @@ type Trip {
   destination: DestinationObject
   budget: BudgetObject!
   timeFrame: TimeFrameObject
+  createdAt: Date!
 }
 
 type DestinationObject {

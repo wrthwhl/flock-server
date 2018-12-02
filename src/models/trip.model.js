@@ -25,6 +25,7 @@ const TripSchema = new Schema({
   name: { type: String, required: true },
   participants: { type: [ ObjectID ], required: true },
   creator: ObjectID,
+  createdAt: { type: Date, default: Date.now },
   destination: {
     isDictated: { type: Boolean, required: true },
     chosenDestination: ObjectID,
