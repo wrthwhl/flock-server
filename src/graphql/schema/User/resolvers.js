@@ -30,7 +30,6 @@ export default {
       return updatedUser;
     },
     register: async (_, { email, password, user: userInput = {} }, { User, user }) => {
-      // TODO if email already exists do nothing!!!!!!
       const currentUser = User.findOne({ email: user.email, _id: user._id });
       if (currentUser) throw new Error('User already exists. Try login instead!');
       password = await bcrypt.hash(password, 12);

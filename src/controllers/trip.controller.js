@@ -2,7 +2,6 @@ import { buildSuggestionsObj } from './helpers';
 import { PubSub, AuthenticationError } from 'apollo-server';
 const pubsub = new PubSub();
 
-// !TODO DO NOT RETURN TOKEN IF REGISTERING WITH EXISTING EMAIL ADRESS BUT WRONG PASSWORD
 // TODO check timeframe input: startDate < endDate
 // TODO check if userid is valid/exists before writing it
 
