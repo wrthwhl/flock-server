@@ -40,7 +40,7 @@ export function* getUsers(n = 1) {
         ...user,
         _id: ('' + i).repeat(24),
         firstName: (user.firstName += suffix),
-        email: user.firstName.toLowerCase() + (user.firstName.includes('Arturo') ? '@travelroo.com' : '@travelnuts.io')
+        email: user.firstName.toLowerCase() + '@flock.io'
       };
     })(users[i % users.length]);
     i++;

@@ -16,21 +16,26 @@ export default {
     }
   },
   Query: {
-    self: (_, __, { User, user: { email } }) => User.findOne({ email }),
+    self: (_, __, { User, user: { email } }) => {
+      if (!email) throw new AuthenticationError();
+      return User.findOne({ email });
+    },
     allUsers: (_, __, { User }) => User.find()
   },
 
   Mutation: {
     updateUser: async (_, { id, update }, { User }) => {
-      const updatedUser = await User.findOneAndUpdate({ _id: id }, update);
+      const updatedUser = await User.findOneAndUpdate({ _id: id }, update, { new: true });
       pubsub.publish('USER_UPDATED', { userUpdated: updatedUser });
       return updatedUser;
     },
-    register: async (_, { email, password, user = {} }, { User }) => {
+    register: async (_, { email, password, user: userInput = {} }, { User, user }) => {
       // TODO if email already exists do nothing!!!!!!
+      const currentUser = User.findOne({ email: user.email, _id: user._id });
+      if (currentUser) throw new Error('User already exists. Try login instead!');
       password = await bcrypt.hash(password, 12);
       try {
-        const currentUser = await User.findOneAndUpdate({ email }, { email, password, ...user }, { upsert: true });
+        const currentUser = await User.findOneAndUpdate({ email }, { email, password, ...userInput }, { upsert: true });
         return getJWT({ _id: currentUser._id, email: currentUser.email });
       } catch (err) {
         console.error(err); // eslint-disable-line no-console
