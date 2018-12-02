@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { getJWT } from '../resolver-helpers';
-import { AuthenticationError, UserInputError } from 'apollo-server';
+import { AuthenticationError } from 'apollo-server';
 const { PubSub, withFilter } = require('apollo-server');
 const pubsub = new PubSub();
 const fetch = require('node-fetch');
