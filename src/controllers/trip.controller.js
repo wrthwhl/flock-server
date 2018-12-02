@@ -136,3 +136,14 @@ export const addOrVoteForBudget = async (tripID, budget, user, { Trip }) => {
   pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: trip });
   return trip;
 };
+
+export const removeVoteForDestination = async (tripID, destinationID, user, Trip) => {
+  return await Trip.findOneAndUpdate(
+    {
+      _id: tripID,
+      'destination.suggestions._id': destinationID
+    },
+    { $pull: { 'destination.suggestions.$.voters': user._id } },
+    { new: true }
+  );
+};

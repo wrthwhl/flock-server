@@ -5,7 +5,8 @@ import {
   addParticipants,
   addOrVoteForDestination,
   addOrVoteForTimeFrame,
-  addOrVoteForBudget
+  addOrVoteForBudget,
+  removeVoteForDestination
 } from '../../../controllers/trip.controller';
 const pubsub = new PubSub();
 
@@ -52,6 +53,11 @@ export default {
     },
     addOrVoteForTimeFrame: async (_, { tripID, timeFrames }, { Trip, user }) => {
       const newTrip = addOrVoteForTimeFrame(tripID, timeFrames, user, { Trip });
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
+    },
+    removeVoteForDestination: async (_, { tripID, destinationID }, { Trip, user }) => {
+      const newTrip = removeVoteForDestination(tripID, destinationID, user, Trip);
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
       return newTrip;
     }
