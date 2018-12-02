@@ -85,6 +85,7 @@ const Trip = mongoose.model('trips', TripSchema);
       isDictated: false,
       suggestions: [
         {
+          _id: '000000000000000000000000',
           value: 500,
           voters: [ '333333333333333333333333', '444444444444444444444444' ],
           creator: '333333333333333333333333'

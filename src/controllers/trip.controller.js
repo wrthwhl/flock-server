@@ -147,3 +147,26 @@ export const removeVoteForDestination = async (tripID, destinationID, user, Trip
     { new: true }
   );
 };
+
+export const removeVoteForTimeFrame = async (tripID, timeFrameID, user, Trip) => {
+  return await Trip.findOneAndUpdate(
+    {
+      _id: tripID,
+      'timeFrame.suggestions._id': timeFrameID
+    },
+    { $pull: { 'timeFrame.suggestions.$.voters': user._id } },
+    { new: true }
+  );
+};
+
+export const removeVoteForBudget = async (tripID, budgetID, user, Trip) => {
+  const newTrip = await Trip.findOneAndUpdate(
+    {
+      _id: tripID,
+      'budget.suggestions._id': budgetID
+    },
+    { $pull: { 'budget.suggestions.$.voters': user._id } },
+    { new: true }
+  );
+  return newTrip;
+};
