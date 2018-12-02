@@ -36,7 +36,7 @@ type DestinationObject {
 }
 
 type Destination {
-  key: ID!
+  id: ID!
   name: String!
   voters: [User!]!
   creator: User!
