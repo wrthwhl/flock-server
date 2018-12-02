@@ -54,6 +54,6 @@ export default {
   },
 
   User: {
-    trips: ({ id }, _, { Trip }) => Trip.find({ participants: id })
+    trips: ({ id }, _, { Trip }) => Trip.find({ participants: id }).sort({ createdAt: -1 })
   }
 };
