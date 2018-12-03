@@ -11,7 +11,10 @@ import {
   removeVoteForBudget,
   lockDestination,
   lockTimeFrame,
-  lockBudget
+  lockBudget,
+  unlockDestination,
+  unlockTimeFrame,
+  unlockBudget
 } from '../../../controllers/trip.controller';
 const pubsub = new PubSub();
 
@@ -88,6 +91,21 @@ export default {
     },
     lockBudget: async (_, { tripID, suggestionID }, { Trip, user }) => {
       const newTrip = lockBudget(tripID, suggestionID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
+    },
+    unlockDestination: async (_, { tripID }, { Trip, user }) => {
+      const newTrip = unlockDestination(tripID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
+    },
+    unlockTimeFrame: async (_, { tripID }, { Trip, user }) => {
+      const newTrip = unlockTimeFrame(tripID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
+    },
+    unlockBudget: async (_, { tripID }, { Trip, user }) => {
+      const newTrip = unlockBudget(tripID, user, Trip);
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
       return newTrip;
     }

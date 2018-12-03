@@ -15,6 +15,9 @@ extend type Mutation {
   lockDestination(tripID: ID!, suggestionID: ID!): Trip!
   lockTimeFrame(tripID: ID!, suggestionID: ID!): Trip!
   lockBudget(tripID: ID!, suggestionID: ID!): Trip!
+  unlockDestination(tripID: ID!): Trip!
+  unlockTimeFrame(tripID: ID!): Trip!
+  unlockBudget(tripID: ID!): Trip!
 }
 
 extend type Subscription {
