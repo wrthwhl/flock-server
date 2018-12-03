@@ -12,9 +12,6 @@ extend type Mutation {
   removeVoteForDestination(tripID: ID!, destinationID: ID!): Trip!
   removeVoteForTimeFrame(tripID: ID!, timeFrameID: ID!): Trip!
   removeVoteForBudget(tripID: ID!, budgetID: ID!): Trip!
-  # removeVoterDestination(tripID: ID, destinationID: ID): Trip!
-  # removeVoterBudget(tripID: ID, budgetID: ID): Trip!
-  # removeBudget(tripID: ID, budget: BudgetObjectInput!): Trip!
 }
 
 extend type Subscription {

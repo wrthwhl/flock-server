@@ -73,28 +73,6 @@ export default {
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
       return newTrip;
     }
-    /* removeVoterDestination: async (_, { tripID, destinationID }, { Trip, User, user: { email } }) => {
-      const user = await User.findOne({ email });
-      if (!user._id) throw new AuthenticationError('No valid user found based on authorization token provided.');
-      return await Trip.findOneAndUpdate(
-        { _id: tripID, 'destination.suggestions._id': destinationID },
-        {
-          $pull: { 'destination.suggestions.$.voters': user._id }
-        },
-        { new: true }
-      );
-    } */
-    /* removeVoterBudget: async (_, { tripID, budgetID }, { Trip, User, user: { email } }) => {
-      const user = await User.findOne({ email });
-      if (!user._id) throw new AuthenticationError('No valid user found based on authorization token provided.');
-      return await Trip.findOneAndUpdate(
-        { _id: tripID, 'budget.suggestions._id': budgetID },
-        {
-          $pull: { 'budget.suggestions.$.voters': user._id }
-        },
-        { new: true }
-      );
-    } */
   },
 
   Trip: {
