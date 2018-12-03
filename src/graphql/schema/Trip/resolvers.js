@@ -8,7 +8,8 @@ import {
   addOrVoteForBudget,
   removeVoteForDestination,
   removeVoteForTimeFrame,
-  removeVoteForBudget
+  removeVoteForBudget,
+  lockDestination
 } from '../../../controllers/trip.controller';
 const pubsub = new PubSub();
 
@@ -70,6 +71,11 @@ export default {
     },
     removeVoteForBudget: async (_, { tripID, budgetID }, { Trip, user }) => {
       const newTrip = removeVoteForBudget(tripID, budgetID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
+    },
+    lockDestination: async (_, { tripID, destinationID }, { Trip, user }) => {
+      const newTrip = lockDestination(tripID, destinationID, user, Trip);
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
       return newTrip;
     }

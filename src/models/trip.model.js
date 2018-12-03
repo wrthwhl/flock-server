@@ -27,17 +27,20 @@ const TripSchema = new Schema({
   creator: ObjectID,
   createdAt: { type: Date, default: Date.now },
   destination: {
-    isDictated: { type: Boolean, required: true },
+    isDictated: { type: Boolean, required: true, default: false },
+    isLocked: { type: Boolean, default: false },
     chosenDestination: ObjectID,
     suggestions: { type: [ DestinationSchema ], required: true }
   },
   budget: {
-    isDictated: Boolean,
+    isDictated: { type: Boolean, required: true, default: false },
+    isLocked: { type: Boolean, default: false },
     chosenBudget: ObjectID,
     suggestions: [ BudgetSchema ]
   },
   timeFrame: {
-    isDictated: Boolean,
+    isDictated: { type: Boolean, required: true, default: false },
+    isLocked: { type: Boolean, default: false },
     chosenTimeFrame: String,
     suggestions: [ TimeFrameSchema ]
   }
