@@ -171,16 +171,18 @@ export const removeVoteForBudget = async (tripID, budgetID, user, Trip) => {
   return newTrip;
 };
 
-export const lockDestination = async (tripID, destinationID, user, Trip) => {
+const lockTripAspect = async (aspect, tripID, suggestionID, user, Trip) => {
   const trip = await Trip.findOne({ _id: user._id });
   if (String(trip.creator) === String(user._id)) {
     return await Trip.findOneAndUpdate(
       { _id: tripID },
       {
-        'destination.chosenDestination': destinationID,
-        'destination.isLocked': true
+        [aspect + '.chosenDestination']: suggestionID,
+        [aspect + '.isLocked']: true
       },
       { new: true }
     );
   }
 };
+
+export const lockDestination = (...args) => lockTripAspect('destination', ...args);
