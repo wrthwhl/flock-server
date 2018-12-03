@@ -1,12 +1,15 @@
+import { users, voters, creator } from '../resolver-helpers';
+import { PubSub, withFilter } from 'apollo-server';
 import {
-  users,
-  voters,
-  creator,
-  buildSuggestionsObj,
-  findUserOrCreate
-} from '../resolver-helpers';
-import { AuthenticationError, PubSub, withFilter } from 'apollo-server';
-import { addOrVoteForTimeFrame } from '../../../controllers/trip.controller';
+  createTrip,
+  addParticipants,
+  addOrVoteForDestination,
+  addOrVoteForTimeFrame,
+  addOrVoteForBudget,
+  removeVoteForDestination,
+  removeVoteForTimeFrame,
+  removeVoteForBudget
+} from '../../../controllers/trip.controller';
 const pubsub = new PubSub();
 
 export default {
@@ -32,224 +35,69 @@ export default {
   },
 
   Mutation: {
-    addOrVoteForTimeFrame: async (
-      _,
-      { tripID, timeFrames },
-      { Trip, user }
-    ) => {
-      return addOrVoteForTimeFrame(tripID, timeFrames, user, Trip);
-    },
-    voteForDestination: async (
-      _,
-      { tripID, destinationID },
-      { Trip, User, user: { email } }
-    ) => {
-      const user = await User.findOne({ email });
-      if (!user._id)
-        throw new AuthenticationError(
-          'No valid user found based on authorization token provided.'
-        );
-      return await Trip.findOneAndUpdate(
-        { _id: tripID, 'destination.suggestions._id': destinationID },
-        {
-          $addToSet: { 'destination.suggestions.$.voters': user._id }
-        },
-        { new: true }
-      );
-    },
     createTrip: async (_, { trip }, { Trip, User, user }) => {
-      if (!user) throw new AuthenticationError();
-      const {
-        destination = { isDictated: false },
-        budget = { isDictated: false },
-        timeFrame = { isDictated: false },
-        participants
-      } = trip;
-
-      trip.participants = await findUserOrCreate(participants, User);
-      trip.participants = [user._id, ...trip.participants];
-      destination.suggestions = buildSuggestionsObj(
-        destination.suggestions,
-        user._id
-      );
-      budget.suggestions = buildSuggestionsObj(budget.suggestions, user._id);
-      timeFrame.suggestions = buildSuggestionsObj(
-        timeFrame.suggestions,
-        user._id
-      );
-      trip['creator'] = user._id;
-      const newTrip = Trip.create({
-        ...trip,
-        destination,
-        budget,
-        timeFrame
-      });
-
+      const newTrip = createTrip(trip, user, { Trip, User });
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
       return newTrip;
     },
-    addParticipant: async (_, { tripID, participants }, { Trip, User }) => {
-      participants = await findUserOrCreate(participants, User);
-      const participant = [
-        { _id: tripID },
-        {
-          $addToSet: {
-            participants: { $each: participants }
-          }
-        },
-        { new: true }
-      ];
-      const newTrip = Trip.findOneAndUpdate(...participant);
+    addParticipants: async (_, { tripID, participants }, ctx) => {
+      const newTrip = addParticipants(tripID, participants, ctx);
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
       return newTrip;
     },
     addOrVoteForDestination: async (
       _,
-      { tripID, destination },
+      { tripID, destinations },
       { Trip, user }
     ) => {
-      let dest = await Trip.findOneAndUpdate(
-        {
-          _id: tripID,
-          'destination.suggestions.name': destination.suggestions[0].name
-        },
-        { $addToSet: { 'destination.suggestions.$.voters': user._id } },
-        { new: true }
-      );
-
-      if (!dest) {
-        dest = Trip.findOneAndUpdate(
-          {
-            _id: tripID
-          },
-          { $push: { 'destination.suggestions': destination.suggestions } },
-          { new: true }
-        );
-      }
-      return dest;
+      const newTrip = addOrVoteForDestination(tripID, destinations, user, {
+        Trip
+      });
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
     },
-
-    addVoterDestination: async (
+    addOrVoteForBudget: async (_, { tripID, budget }, { Trip, user }) => {
+      const newTrip = addOrVoteForBudget(tripID, budget, user, { Trip });
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
+    },
+    addOrVoteForTimeFrame: async (
+      _,
+      { tripID, timeFrames },
+      { Trip, user }
+    ) => {
+      const newTrip = addOrVoteForTimeFrame(tripID, timeFrames, user, { Trip });
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
+    },
+    removeVoteForDestination: async (
       _,
       { tripID, destinationID },
-      { Trip, User, user: { email } }
+      { Trip, user }
     ) => {
-      const user = await User.findOne({ email });
-      if (!user._id)
-        throw new AuthenticationError(
-          'No valid user found based on authorization token provided.'
-        );
-      return await Trip.findOneAndUpdate(
-        { _id: tripID, 'destination.suggestions._id': destinationID },
-        {
-          $addToSet: { 'destination.suggestions.$.voters': user._id }
-        },
-        { new: true }
+      const newTrip = removeVoteForDestination(
+        tripID,
+        destinationID,
+        user,
+        Trip
       );
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
     },
-    removeVoterDestination: async (
+    removeVoteForTimeFrame: async (
       _,
-      { tripID, destinationID },
-      { Trip, User, user: { email } }
+      { tripID, timeFrameID },
+      { Trip, user }
     ) => {
-      const user = await User.findOne({ email });
-      if (!user._id)
-        throw new AuthenticationError(
-          'No valid user found based on authorization token provided.'
-        );
-      return await Trip.findOneAndUpdate(
-        { _id: tripID, 'destination.suggestions._id': destinationID },
-        {
-          $pull: { 'destination.suggestions.$.voters': user._id }
-        },
-        { new: true }
-      );
+      const newTrip = removeVoteForTimeFrame(tripID, timeFrameID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
     },
-    addBudget: (_, { tripID, budget }, { Trip }) => {
-      let suggestion = budget.suggestions;
-      let addBudgetSuggestion = [
-        { _id: tripID },
-        {
-          $addToSet: {
-            'budget.suggestions': { $each: suggestion }
-          }
-        },
-        { new: true }
-      ];
-
-      return Trip.findOneAndUpdate(...addBudgetSuggestion);
-    },
-    addTimeFrame: (_, { tripID, timeFrame }, { Trip }) => {
-      let suggestion = timeFrame.suggestions;
-      let addTimeFrameSuggestion = [
-        { _id: tripID },
-        {
-          $addToSet: {
-            'timeFrame.suggestions': { $each: suggestion }
-          }
-        },
-        { new: true }
-      ];
-      return Trip.findOneAndUpdate(...addTimeFrameSuggestion);
-    },
-    addVoterBudget: async (
-      _,
-      { tripID, budgetID },
-      { Trip, User, user: { email } }
-    ) => {
-      const user = await User.findOne({ email });
-      if (!user._id)
-        throw new AuthenticationError(
-          'No valid user found based on authorization token provided.'
-        );
-      return await Trip.findOneAndUpdate(
-        { _id: tripID, 'budget.suggestions._id': budgetID },
-        {
-          $addToSet: { 'budget.suggestions.$.voters': user._id }
-        },
-        { new: true }
-      );
-    },
-    removeVoterBudget: async (
-      _,
-      { tripID, budgetID },
-      { Trip, User, user: { email } }
-    ) => {
-      const user = await User.findOne({ email });
-      if (!user._id)
-        throw new AuthenticationError(
-          'No valid user found based on authorization token provided.'
-        );
-      return await Trip.findOneAndUpdate(
-        { _id: tripID, 'budget.suggestions._id': budgetID },
-        {
-          $pull: { 'budget.suggestions.$.voters': user._id }
-        },
-        { new: true }
-      );
-    },
-    removeParticipant: async (
-      _,
-      { tripID, ParticipantID },
-      { Trip, User, user: { email } }
-    ) => {
-      const user = await User.findOne({ email });
-      if (!user._id)
-        throw new AuthenticationError(
-          'No valid user found based on authorization token provided.'
-        );
-
-      return await Trip.findOneAndUpdate(
-        { _id: tripID },
-        {
-          $pull: { participants: ParticipantID }
-        },
-        { new: true }
-      );
+    removeVoteForBudget: async (_, { tripID, budgetID }, { Trip, user }) => {
+      const newTrip = removeVoteForBudget(tripID, budgetID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
     }
-    // const updatedTrip = Trip.findOneAndUpdate(...addSuggestion);
-    // pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
-    // return updatedTrip;
   },
 
   Trip: {
@@ -258,9 +106,10 @@ export default {
   },
   DestinationObject: {
     chosenDestination: ({ chosenDestination, suggestions }) =>
+      chosenDestination &&
       suggestions.find(
         destination => String(chosenDestination) === String(destination._id)
-      ) || null
+      )
   },
   Destination: {
     voters,
@@ -268,7 +117,8 @@ export default {
   },
   BudgetObject: {
     chosenBudget: ({ chosenBudget, suggestions }) =>
-      chosenBudget || suggestions.find(budget => chosenBudget === budget._id)
+      chosenBudget &&
+      suggestions.find(budget => String(chosenBudget) === String(budget._id))
   },
   Budget: {
     voters,
@@ -276,8 +126,10 @@ export default {
   },
   TimeFrameObject: {
     chosenTimeFrame: ({ chosenTimeFrame, suggestions }) =>
-      chosenTimeFrame ||
-      suggestions.find(timeFrame => chosenTimeFrame === timeFrame._id)
+      chosenTimeFrame &&
+      suggestions.find(
+        timeFrame => String(chosenTimeFrame) === String(timeFrame._id)
+      )
   },
   TimeFrame: {
     voters,
