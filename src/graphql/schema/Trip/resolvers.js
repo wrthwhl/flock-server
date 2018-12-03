@@ -1,5 +1,6 @@
 import { users, voters, creator, chosenSuggestion } from '../resolver-helpers';
 import { PubSub, withFilter } from 'apollo-server';
+import { sendEmail } from '../../../controllers/email.controller';
 import {
   createTrip,
   addParticipants,
@@ -64,12 +65,14 @@ export default {
         User
       });
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+
       affectedUsers.forEach(({ id, allTrips }) => {
         pubsub.publish('OWN_TRIPS_CHANGED', {
           ownTripsChanged: allTrips,
           affectedUser: id
         });
       });
+
       return newTrip;
     },
     addParticipants: async (_, { tripID, participants }, { User, Trip }) => {

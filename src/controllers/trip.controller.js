@@ -1,4 +1,5 @@
 import { buildSuggestionsObj } from './helpers';
+
 import { AuthenticationError } from 'apollo-server';
 
 // TODO check timeframe input: startDate < endDate
@@ -14,17 +15,26 @@ export const createTrip = async (trip, user, { Trip, User }) => {
   let { participants } = trip;
 
   if (budget && budget.suggestions && budget.suggestions.length > 1)
-    throw new Error('Multiple budget suggestions received, only one suggestion allowed.');
+    throw new Error(
+      'Multiple budget suggestions received, only one suggestion allowed.'
+    );
 
   participants = await Promise.all(
-    participants.map(async (email) => {
-      const user = await User.findOneAndUpdate({ email }, { email }, { upsert: true, new: true });
+    participants.map(async email => {
+      const user = await User.findOneAndUpdate(
+        { email },
+        { email },
+        { upsert: true, new: true }
+      );
       return user._id;
     })
   );
 
-  participants = [ ...new Set([ user._id, ...participants ]) ];
-  destination.suggestions = buildSuggestionsObj(destination.suggestions, user._id);
+  participants = [...new Set([user._id, ...participants])];
+  destination.suggestions = buildSuggestionsObj(
+    destination.suggestions,
+    user._id
+  );
   budget.suggestions = buildSuggestionsObj(budget.suggestions, user._id);
   timeFrame.suggestions = buildSuggestionsObj(timeFrame.suggestions, user._id);
   trip['creator'] = user._id;
@@ -37,14 +47,22 @@ export const createTrip = async (trip, user, { Trip, User }) => {
   });
   if (destination.isDictated || timeFrame.isDictated || budget.isDictated) {
     const update = {};
-    if (destination.isDictated) update['destination.chosenSuggestion'] = newTrip.destination.suggestions[0]._id;
-    if (timeFrame.isDictated) update['timeFrame.chosenSuggestion'] = newTrip.timeFrame.suggestions[0]._id;
-    if (budget.isDictated) update['budget.chosenSuggestion'] = newTrip.budget.suggestions[0]._id;
-    newTrip = await Trip.findOneAndUpdate({ _id: newTrip._id }, update, { new: true });
+
+    if (destination.isDictated)
+      update['destination.chosenSuggestion'] =
+        newTrip.destination.suggestions[0]._id;
+    if (timeFrame.isDictated)
+      update['timeFrame.chosenSuggestion'] =
+        newTrip.timeFrame.suggestions[0]._id;
+    if (budget.isDictated)
+      update['budget.chosenSuggestion'] = newTrip.budget.suggestions[0]._id;
+    newTrip = await Trip.findOneAndUpdate({ _id: newTrip._id }, update, {
+      new: true
+    });
   }
 
   const affectedUsers = await Promise.all(
-    newTrip.participants.map(async (id) => {
+    newTrip.participants.map(async id => {
       const allTrips = await Trip.find({ participants: id });
       return { id, allTrips };
     })
@@ -54,8 +72,12 @@ export const createTrip = async (trip, user, { Trip, User }) => {
 
 export const addParticipants = async (tripID, participants, { User, Trip }) => {
   participants = await Promise.all(
-    participants.map(async (email) => {
-      const user = await User.findOneAndUpdate({ email }, { email }, { upsert: true, new: true });
+    participants.map(async email => {
+      const user = await User.findOneAndUpdate(
+        { email },
+        { email },
+        { upsert: true, new: true }
+      );
       return user._id;
     })
   );
@@ -69,9 +91,10 @@ export const addParticipants = async (tripID, participants, { User, Trip }) => {
     },
     { new: true }
   );
-  if (!updatedTrip) throw new Error('Could not find this trip in our database.');
+  if (!updatedTrip)
+    throw new Error('Could not find this trip in our database.');
   const affectedUsers = await Promise.all(
-    updatedTrip.participants.map(async (id) => {
+    updatedTrip.participants.map(async id => {
       const allTrips = await Trip.find({ participants: id });
       return { id, allTrips };
     })
@@ -81,15 +104,18 @@ export const addParticipants = async (tripID, participants, { User, Trip }) => {
 
 export const removeParticipants = async (tripID, participants, User, Trip) => {
   participants = await User.find({ email: { $in: participants } });
-  participants = participants.map((user) => String(user._id));
+  participants = participants.map(user => String(user._id));
   const updatedTrip = await Trip.findOneAndUpdate(
     { _id: tripID },
     { $pull: { participants: { $in: participants } } },
     { new: true }
   );
-  if (!updatedTrip) throw new Error('Could not process request to remove Participant from trip.');
+  if (!updatedTrip)
+    throw new Error(
+      'Could not process request to remove Participant from trip.'
+    );
   const affectedUsers = await Promise.all(
-    participants.map(async (id) => {
+    participants.map(async id => {
       const allTrips = await Trip.find({ participants: id });
       return { id, allTrips };
     })
@@ -97,10 +123,16 @@ export const removeParticipants = async (tripID, participants, User, Trip) => {
   return { updatedTrip, affectedUsers };
 };
 
-export const addOrVoteForDestination = async (tripID, destinations, user, { Trip }) => {
+export const addOrVoteForDestination = async (
+  tripID,
+  destinations,
+  user,
+  { Trip }
+) => {
   destinations = buildSuggestionsObj(destinations, user._id);
+
   let updatedTrip;
-  const promises = destinations.map(async (destination) => {
+  const promises = destinations.map(async destination => {
     updatedTrip = await Trip.findOneAndUpdate(
       {
         _id: tripID,
@@ -126,14 +158,19 @@ export const addOrVoteForDestination = async (tripID, destinations, user, { Trip
   return updatedTrip;
 };
 
-export const addOrVoteForTimeFrame = async (tripID, timeFrames, user, { Trip }) => {
+export const addOrVoteForTimeFrame = async (
+  tripID,
+  timeFrames,
+  user,
+  { Trip }
+) => {
   timeFrames = timeFrames.map(({ startDate, endDate }) => ({
     startDate: startDate.split('T')[0] || startDate,
     endDate: endDate.split('T')[0] || endDate
   }));
   timeFrames = buildSuggestionsObj(timeFrames, user._id);
   let updatedTrip;
-  const promises = await timeFrames.map(async (timeFrame) => {
+  const promises = await timeFrames.map(async timeFrame => {
     updatedTrip = await Trip.findOneAndUpdate(
       {
         _id: tripID,
@@ -156,7 +193,7 @@ export const addOrVoteForTimeFrame = async (tripID, timeFrames, user, { Trip }) 
 };
 
 export const addOrVoteForBudget = async (tripID, budget, user, { Trip }) => {
-  budget = buildSuggestionsObj([ budget ], user._id)[0];
+  budget = buildSuggestionsObj([budget], user._id)[0];
   let updatedTrip = await Trip.findOneAndUpdate(
     {
       _id: tripID
@@ -180,13 +217,23 @@ export const addOrVoteForBudget = async (tripID, budget, user, { Trip }) => {
       new: true
     }
   );
+
   if (!updatedTrip)
-    updatedTrip = Trip.findOneAndUpdate({ _id: tripID }, { $push: { 'budget.suggestions': budget } }, { new: true });
+    updatedTrip = Trip.findOneAndUpdate(
+      { _id: tripID },
+      { $push: { 'budget.suggestions': budget } },
+      { new: true }
+    );
 
   return updatedTrip;
 };
 
-export const removeVoteForDestination = async (tripID, suggestionID, user, Trip) => {
+export const removeVoteForDestination = async (
+  tripID,
+  suggestionID,
+  user,
+  Trip
+) => {
   return await Trip.findOneAndUpdate(
     {
       _id: tripID,
@@ -197,7 +244,12 @@ export const removeVoteForDestination = async (tripID, suggestionID, user, Trip)
   );
 };
 
-export const removeVoteForTimeFrame = async (tripID, suggestionID, user, Trip) => {
+export const removeVoteForTimeFrame = async (
+  tripID,
+  suggestionID,
+  user,
+  Trip
+) => {
   return await Trip.findOneAndUpdate(
     {
       _id: tripID,
@@ -222,8 +274,11 @@ export const removeVoteForBudget = async (tripID, suggestionID, user, Trip) => {
 
 const lockTripAspect = async (aspect, tripID, suggestionID, user, Trip) => {
   const trip = await Trip.findOne({ _id: tripID });
-  const suggestionIDs = trip[aspect]['suggestions'].map((suggestion) => String(suggestion._id));
-  if (!suggestionIDs.includes(String(suggestionID))) throw new Error('Suggestion with provided ID does not exist!');
+  const suggestionIDs = trip[aspect]['suggestions'].map(suggestion =>
+    String(suggestion._id)
+  );
+  if (!suggestionIDs.includes(String(suggestionID)))
+    throw new Error('Suggestion with provided ID does not exist!');
   if (!String(trip.creator) === String(user._id))
     throw new Error('Only creator of trip is allowed to lock a trip aspect!');
   return await Trip.findOneAndUpdate(
@@ -255,31 +310,46 @@ const writeMessageAspect = async (aspect, tripID, message, user, Trip) => {
       { new: true }
     );
 
-    newTrip.messages = newTrip.messages.sort((a, b) => a.createdAt - b.createdAt);
+    newTrip.messages = newTrip.messages.sort(
+      (a, b) => a.createdAt - b.createdAt
+    );
 
     return newTrip;
   } catch (e) {
-    throw new Error('Could not create chat message. Your flock maybe has already flown away', e);
+    throw new Error(
+      'Could not create chat message. Your flock maybe has already flown away',
+      e
+    );
   }
 };
 
-export const lockDestination = (...args) => lockTripAspect('destination', ...args);
+export const lockDestination = (...args) =>
+  lockTripAspect('destination', ...args);
 export const lockTimeFrame = (...args) => lockTripAspect('timeFrame', ...args);
 export const lockBudget = (...args) => lockTripAspect('budget', ...args);
 
-export const unlockDestination = (...args) => unlockTripAspect('destination', ...args);
-export const unlockTimeFrame = (...args) => unlockTripAspect('timeFrame', ...args);
+export const unlockDestination = (...args) =>
+  unlockTripAspect('destination', ...args);
+export const unlockTimeFrame = (...args) =>
+  unlockTripAspect('timeFrame', ...args);
 export const unlockBudget = (...args) => unlockTripAspect('budget', ...args);
 
-export const writeGeneralMessage = (...args) => writeMessageAspect('GENERAL', ...args);
-export const writeDestinationMessage = (...args) => writeMessageAspect('DESTINATION', ...args);
-export const writeTimeFrameMessage = (...args) => writeMessageAspect('TIMEFRAME', ...args);
-export const writeBudetMessage = (...args) => writeMessageAspect('BUDGET', ...args);
+export const writeGeneralMessage = (...args) =>
+  writeMessageAspect('GENERAL', ...args);
+export const writeDestinationMessage = (...args) =>
+  writeMessageAspect('DESTINATION', ...args);
+export const writeTimeFrameMessage = (...args) =>
+  writeMessageAspect('TIMEFRAME', ...args);
+export const writeBudetMessage = (...args) =>
+  writeMessageAspect('BUDGET', ...args);
 export const leaveTrip = async (tripID, _id, Trip) => {
   const tripThatWillBeLeft = await Trip.findOne({ _id: tripID });
-  if (!_id || !tripThatWillBeLeft) throw new Error('Could not process request for logged-in user to leave trip.');
+  if (!_id || !tripThatWillBeLeft)
+    throw new Error(
+      'Could not process request for logged-in user to leave trip.'
+    );
   const newParticipants = tripThatWillBeLeft.participants.filter(
-    (potentialLeaver) => potentialLeaver.toString() !== _id.toString()
+    potentialLeaver => potentialLeaver.toString() !== _id.toString()
   );
   const updatedTrip = await Trip.findOneAndUpdate(
     { _id: tripID },

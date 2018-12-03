@@ -1,4 +1,4 @@
-const getConfig = (ENV) => {
+const getConfig = ENV => {
   if (ENV && ENV.includes('dev')) {
     return {
       SECRET: '0hS0v3rYS3cr3T1sMYl1ttl3S3cr3t',
@@ -11,7 +11,8 @@ const getConfig = (ENV) => {
           'editor.cursorShape': 'block'
         }
       },
-      mongoose: [ 'mongodb://localhost/travelroo', { useNewUrlParser: true } ],
+
+      mongoose: ['mongodb://localhost/travelroo', { useNewUrlParser: true }],
       facebook: {
         serverAccessToken: '' // <-- PUT facebook server access token here!
       }
@@ -30,7 +31,8 @@ const getConfig = (ENV) => {
           'editor.cursorShape': 'block'
         }
       },
-      mongoose: [ 'mongodb://localhost/travelroo', { useNewUrlParser: true } ],
+
+      mongoose: ['mongodb://localhost/travelroo', { useNewUrlParser: true }],
       facebook: {
         serverAccessToken: '' // <-- PUT facebook server access token here!
       }
