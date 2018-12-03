@@ -20,6 +20,7 @@ export default {
       subscribe: withFilter(
         () => pubsub.asyncIterator('OWN_TRIPS_CHANGED'),
         async (payload, _, { User, user: { email } }) => {
+          console.log(await payload.userThatLeavesTrip);
           const user = await User.findOne({ email });
           const userThatLeavesTrip = await payload.userThatLeavesTrip;
           return userThatLeavesTrip._id.toString() === user._id.toString();
@@ -185,16 +186,42 @@ export default {
     leaveTrip: async (_, { tripID }, { Trip, User, user: { email } }) => {
       const userThatLeavesTrip = await User.findOne({ email });
       const tripThatWillBeLeft = await Trip.findOne({ _id: tripID });
-      const newParticipants = tripThatWillBeLeft.participants.filter(
-        (potentialLeaver) => potentialLeaver.toString() !== userThatLeavesTrip._id.toString()
-      );
-      await Trip.findOneAndUpdate({ _id: tripID }, { $set: { participants: newParticipants } }, { new: true });
+      if (userThatLeavesTrip && tripThatWillBeLeft) {
+        const newParticipants = tripThatWillBeLeft.participants.filter(
+          (potentialLeaver) => potentialLeaver.toString() !== userThatLeavesTrip._id.toString()
+        );
+        await Trip.findOneAndUpdate({ _id: tripID }, { $set: { participants: newParticipants } }, { new: true });
+      }
       const allTrips = await Trip.find({ participants: userThatLeavesTrip._id });
       pubsub.publish('OWN_TRIPS_CHANGED', { ownTripsChanged: allTrips, userThatLeavesTrip });
       return allTrips;
     },
 
-    removeParticipants: () => {}
+    removeParticipant: async (_, { tripID, participant }, { Trip, User, user: { email } }) => {
+      const userToRemove = await User.findOne({ email: participant });
+      const userThatDeletes = await User.findOne({ email });
+      const tripToDeleteParticipant = await Trip.findOne({ _id: tripID });
+      if (
+        userThatDeletes &&
+        userToRemove &&
+        tripToDeleteParticipant &&
+        userThatDeletes._id.toString() === tripToDeleteParticipant.creator.toString()
+      ) {
+        const newParticipants = tripToDeleteParticipant.participants.filter(
+          (parForCheck) => parForCheck.toString() !== userToRemove._id.toString()
+        );
+        const updatedTrip = await Trip.findOneAndUpdate(
+          { _id: tripID },
+          { participants: newParticipants },
+          { new: true }
+        );
+        pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+        const allTrips = await Trip.find({ participants: userToRemove._id });
+        pubsub.publish('OWN_TRIPS_CHANGED', { ownTripsChanged: allTrips, userThatLeavesTrip: userToRemove });
+        return updatedTrip;
+      }
+      return tripToDeleteParticipant;
+    }
   },
 
   Trip: {
