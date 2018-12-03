@@ -1,5 +1,6 @@
 import { buildSuggestionsObj } from './helpers';
 import { PubSub, AuthenticationError } from 'apollo-server';
+
 const pubsub = new PubSub();
 
 // TODO check timeframe input: startDate < endDate
@@ -15,14 +16,21 @@ export const createTrip = async (trip, user, { Trip, User }) => {
   let { participants } = trip;
 
   participants = await Promise.all(
-    participants.map(async (email) => {
-      const user = await User.findOneAndUpdate({ email }, { email }, { upsert: true, new: true });
+    participants.map(async email => {
+      const user = await User.findOneAndUpdate(
+        { email },
+        { email },
+        { upsert: true, new: true }
+      );
       return user._id;
     })
   );
 
-  participants = [ ...new Set([ user._id, ...participants ]) ];
-  destination.suggestions = buildSuggestionsObj(destination.suggestions, user._id);
+  participants = [...new Set([user._id, ...participants])];
+  destination.suggestions = buildSuggestionsObj(
+    destination.suggestions,
+    user._id
+  );
   budget.suggestions = buildSuggestionsObj(budget.suggestions, user._id);
   timeFrame.suggestions = buildSuggestionsObj(timeFrame.suggestions, user._id);
   trip['creator'] = user._id;
@@ -35,10 +43,17 @@ export const createTrip = async (trip, user, { Trip, User }) => {
   });
   if (destination.isDictated || timeFrame.isDictated || budget.isDictated) {
     const update = {};
-    if (destination.isDictated) update['destination.chosenDestination'] = newTrip.destination.suggestions[0]._id;
-    if (timeFrame.isDictated) update['timeFrame.chosenTimeFrame'] = newTrip.timeFrame.suggestions[0]._id;
-    if (budget.isDictated) update['budget.chosenBudget'] = newTrip.budget.suggestions[0]._id;
-    newTrip = await Trip.findOneAndUpdate({ _id: newTrip._id }, update, { new: true });
+    if (destination.isDictated)
+      update['destination.chosenDestination'] =
+        newTrip.destination.suggestions[0]._id;
+    if (timeFrame.isDictated)
+      update['timeFrame.chosenTimeFrame'] =
+        newTrip.timeFrame.suggestions[0]._id;
+    if (budget.isDictated)
+      update['budget.chosenBudget'] = newTrip.budget.suggestions[0]._id;
+    newTrip = await Trip.findOneAndUpdate({ _id: newTrip._id }, update, {
+      new: true
+    });
   }
 
   pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
@@ -47,8 +62,12 @@ export const createTrip = async (trip, user, { Trip, User }) => {
 
 export const addParticipants = async (tripID, participants, { User, Trip }) => {
   participants = await Promise.all(
-    participants.map(async (email) => {
-      const user = await User.findOneAndUpdate({ email }, { email }, { upsert: true, new: true });
+    participants.map(async email => {
+      const user = await User.findOneAndUpdate(
+        { email },
+        { email },
+        { upsert: true, new: true }
+      );
       return user._id;
     })
   );
@@ -66,10 +85,15 @@ export const addParticipants = async (tripID, participants, { User, Trip }) => {
   return newTrip;
 };
 
-export const addOrVoteForDestination = async (tripID, destinations, user, { Trip }) => {
+export const addOrVoteForDestination = async (
+  tripID,
+  destinations,
+  user,
+  { Trip }
+) => {
   destinations = buildSuggestionsObj(destinations, user._id);
   let newTrip;
-  const promises = destinations.map(async (destination) => {
+  const promises = destinations.map(async destination => {
     newTrip = await Trip.findOneAndUpdate(
       {
         _id: tripID,
@@ -95,10 +119,15 @@ export const addOrVoteForDestination = async (tripID, destinations, user, { Trip
   return newTrip;
 };
 
-export const addOrVoteForTimeFrame = async (tripID, timeFrames, user, { Trip }) => {
+export const addOrVoteForTimeFrame = async (
+  tripID,
+  timeFrames,
+  user,
+  { Trip }
+) => {
   timeFrames = buildSuggestionsObj(timeFrames, user._id);
   let newTrip;
-  const promises = await timeFrames.map(async (timeFrame) => {
+  const promises = await timeFrames.map(async timeFrame => {
     newTrip = await Trip.findOneAndUpdate(
       {
         _id: tripID,
@@ -122,7 +151,7 @@ export const addOrVoteForTimeFrame = async (tripID, timeFrames, user, { Trip }) 
 };
 
 export const addOrVoteForBudget = async (tripID, budget, user, { Trip }) => {
-  budget = buildSuggestionsObj([ budget ], user._id)[0];
+  budget = buildSuggestionsObj([budget], user._id)[0];
   let trip = await Trip.findOneAndUpdate(
     {
       _id: tripID,
@@ -131,13 +160,23 @@ export const addOrVoteForBudget = async (tripID, budget, user, { Trip }) => {
     { $addToSet: { 'budget.suggestions.$.voters': user._id } },
     { new: true }
   );
-  if (!trip) trip = Trip.findOneAndUpdate({ _id: tripID }, { $push: { 'budget.suggestions': budget } }, { new: true });
+  if (!trip)
+    trip = Trip.findOneAndUpdate(
+      { _id: tripID },
+      { $push: { 'budget.suggestions': budget } },
+      { new: true }
+    );
 
   pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: trip });
   return trip;
 };
 
-export const removeVoteForDestination = async (tripID, destinationID, user, Trip) => {
+export const removeVoteForDestination = async (
+  tripID,
+  destinationID,
+  user,
+  Trip
+) => {
   return await Trip.findOneAndUpdate(
     {
       _id: tripID,
@@ -148,7 +187,12 @@ export const removeVoteForDestination = async (tripID, destinationID, user, Trip
   );
 };
 
-export const removeVoteForTimeFrame = async (tripID, timeFrameID, user, Trip) => {
+export const removeVoteForTimeFrame = async (
+  tripID,
+  timeFrameID,
+  user,
+  Trip
+) => {
   return await Trip.findOneAndUpdate(
     {
       _id: tripID,

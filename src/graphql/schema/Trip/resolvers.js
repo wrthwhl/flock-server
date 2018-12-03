@@ -1,5 +1,6 @@
 import { users, voters, creator } from '../resolver-helpers';
 import { PubSub, withFilter } from 'apollo-server';
+import { sendEmail } from '../../../controllers/email.controller';
 import {
   createTrip,
   addParticipants,
@@ -38,6 +39,8 @@ export default {
     createTrip: async (_, { trip }, { Trip, User, user }) => {
       const newTrip = createTrip(trip, user, { Trip, User });
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      sendEmail({ trip, user });
+
       return newTrip;
     },
     addParticipants: async (_, { tripID, participants }, ctx) => {
