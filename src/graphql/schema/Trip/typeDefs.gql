@@ -4,7 +4,7 @@ extend type Query {
 }
 
 extend type Mutation {
-  createTrip(trip: TripInput!, userID: ID): Trip!
+  createTrip(trip: TripInput!): Trip!
   addParticipants(tripID: ID, participants: [String!]!): Trip!
   addOrVoteForDestination(tripID: ID, destinations: [DestinationInput!]!): Trip!
   addOrVoteForTimeFrame(tripID: ID!, timeFrames: [TimeFrameInput!]!): Trip!
