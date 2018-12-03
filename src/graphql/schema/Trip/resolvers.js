@@ -23,8 +23,6 @@ export default {
           console.log(await payload.userThatLeavesTrip);
           const user = await User.findOne({ email });
           const userThatLeavesTrip = await payload.userThatLeavesTrip;
-
-          console.log('////// PAYLOAD', payload.userLeftTrip);
           return userThatLeavesTrip._id.toString() === user._id.toString();
         }
       )
@@ -186,7 +184,6 @@ export default {
     },
 
     leaveTrip: async (_, { tripID }, { Trip, User, user: { email } }) => {
-      // console.log(email);
       const userThatLeavesTrip = await User.findOne({ email });
       const tripThatWillBeLeft = await Trip.findOne({ _id: tripID });
       if (userThatLeavesTrip && tripThatWillBeLeft) {
@@ -196,7 +193,6 @@ export default {
         await Trip.findOneAndUpdate({ _id: tripID }, { $set: { participants: newParticipants } }, { new: true });
       }
       const allTrips = await Trip.find({ participants: userThatLeavesTrip._id });
-      console.log('///// ALLTRIPS', allTrips);
       pubsub.publish('OWN_TRIPS_CHANGED', { ownTripsChanged: allTrips, userThatLeavesTrip });
       return allTrips;
     },
