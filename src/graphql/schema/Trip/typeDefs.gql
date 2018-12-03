@@ -9,10 +9,12 @@ extend type Mutation {
   addOrVoteForDestination(tripID: ID, destinations: [DestinationInput!]!): Trip!
   addOrVoteForTimeFrame(tripID: ID!, timeFrames: [TimeFrameInput!]!): Trip!
   addOrVoteForBudget(tripID: ID!, budget: BudgetInput!): Trip!
-  removeVoteForDestination(tripID: ID!, destinationID: ID!): Trip!
-  removeVoteForTimeFrame(tripID: ID!, timeFrameID: ID!): Trip!
-  removeVoteForBudget(tripID: ID!, budgetID: ID!): Trip!
+  removeVoteForDestination(tripID: ID!, suggestionID: ID!): Trip!
+  removeVoteForTimeFrame(tripID: ID!, suggestionID: ID!): Trip!
+  removeVoteForBudget(tripID: ID!, suggestionID: ID!): Trip!
   lockDestination(tripID: ID!, suggestionID: ID!): Trip!
+  lockTimeFrame(tripID: ID!, suggestionID: ID!): Trip!
+  lockBudget(tripID: ID!, suggestionID: ID!): Trip!
 }
 
 extend type Subscription {

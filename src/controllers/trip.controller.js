@@ -186,3 +186,5 @@ const lockTripAspect = async (aspect, tripID, suggestionID, user, Trip) => {
 };
 
 export const lockDestination = (...args) => lockTripAspect('destination', ...args);
+export const lockTimeFrame = (...args) => lockTripAspect('timeFrame', ...args);
+export const lockBudget = (...args) => lockTripAspect('budget', ...args);
