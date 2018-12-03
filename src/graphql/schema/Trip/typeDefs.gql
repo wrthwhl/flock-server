@@ -4,14 +4,20 @@ extend type Query {
 }
 
 extend type Mutation {
-  createTrip(trip: TripInput!, userID: ID): Trip!
+  createTrip(trip: TripInput!): Trip!
   addParticipants(tripID: ID, participants: [String!]!): Trip!
   addOrVoteForDestination(tripID: ID, destinations: [DestinationInput!]!): Trip!
   addOrVoteForTimeFrame(tripID: ID!, timeFrames: [TimeFrameInput!]!): Trip!
   addOrVoteForBudget(tripID: ID!, budget: BudgetInput!): Trip!
-  removeVoteForDestination(tripID: ID!, destinationID: ID!): Trip!
-  removeVoteForTimeFrame(tripID: ID!, timeFrameID: ID!): Trip!
-  removeVoteForBudget(tripID: ID!, budgetID: ID!): Trip!
+  removeVoteForDestination(tripID: ID!, suggestionID: ID!): Trip!
+  removeVoteForTimeFrame(tripID: ID!, suggestionID: ID!): Trip!
+  removeVoteForBudget(tripID: ID!, suggestionID: ID!): Trip!
+  lockDestination(tripID: ID!, suggestionID: ID!): Trip!
+  lockTimeFrame(tripID: ID!, suggestionID: ID!): Trip!
+  lockBudget(tripID: ID!, suggestionID: ID!): Trip!
+  unlockDestination(tripID: ID!): Trip!
+  unlockTimeFrame(tripID: ID!): Trip!
+  unlockBudget(tripID: ID!): Trip!
 }
 
 extend type Subscription {
@@ -30,9 +36,10 @@ type Trip {
 }
 
 type DestinationObject {
-  chosenDestination: Destination
-  suggestions: [Destination]!
   isDictated: Boolean
+  isLocked: Boolean
+  chosenSuggestion: Destination
+  suggestions: [Destination]!
 }
 
 type Destination {
@@ -43,9 +50,10 @@ type Destination {
 }
 
 type BudgetObject {
-  chosenBudget: Budget
-  suggestions: [Budget]!
   isDictated: Boolean
+  isLocked: Boolean
+  chosenSuggestion: Budget
+  suggestions: [Budget]!
 }
 
 type Budget {
@@ -56,9 +64,10 @@ type Budget {
 }
 
 type TimeFrameObject {
-  chosenTimeFrame: TimeFrame
-  suggestions: [TimeFrame]!
   isDictated: Boolean
+  isLocked: Boolean
+  chosenSuggestion: TimeFrame
+  suggestions: [TimeFrame]!
 }
 
 type TimeFrame {

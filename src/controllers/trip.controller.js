@@ -35,9 +35,9 @@ export const createTrip = async (trip, user, { Trip, User }) => {
   });
   if (destination.isDictated || timeFrame.isDictated || budget.isDictated) {
     const update = {};
-    if (destination.isDictated) update['destination.chosenDestination'] = newTrip.destination.suggestions[0]._id;
-    if (timeFrame.isDictated) update['timeFrame.chosenTimeFrame'] = newTrip.timeFrame.suggestions[0]._id;
-    if (budget.isDictated) update['budget.chosenBudget'] = newTrip.budget.suggestions[0]._id;
+    if (destination.isDictated) update['destination.chosenSuggestion'] = newTrip.destination.suggestions[0]._id;
+    if (timeFrame.isDictated) update['timeFrame.chosenSuggestion'] = newTrip.timeFrame.suggestions[0]._id;
+    if (budget.isDictated) update['budget.chosenSuggestion'] = newTrip.budget.suggestions[0]._id;
     newTrip = await Trip.findOneAndUpdate({ _id: newTrip._id }, update, { new: true });
   }
 
@@ -137,36 +137,69 @@ export const addOrVoteForBudget = async (tripID, budget, user, { Trip }) => {
   return trip;
 };
 
-export const removeVoteForDestination = async (tripID, destinationID, user, Trip) => {
+export const removeVoteForDestination = async (tripID, suggestionID, user, Trip) => {
   return await Trip.findOneAndUpdate(
     {
       _id: tripID,
-      'destination.suggestions._id': destinationID
+      'destination.suggestions._id': suggestionID
     },
     { $pull: { 'destination.suggestions.$.voters': user._id } },
     { new: true }
   );
 };
 
-export const removeVoteForTimeFrame = async (tripID, timeFrameID, user, Trip) => {
+export const removeVoteForTimeFrame = async (tripID, suggestionID, user, Trip) => {
   return await Trip.findOneAndUpdate(
     {
       _id: tripID,
-      'timeFrame.suggestions._id': timeFrameID
+      'timeFrame.suggestions._id': suggestionID
     },
     { $pull: { 'timeFrame.suggestions.$.voters': user._id } },
     { new: true }
   );
 };
 
-export const removeVoteForBudget = async (tripID, budgetID, user, Trip) => {
+export const removeVoteForBudget = async (tripID, suggestionID, user, Trip) => {
   const newTrip = await Trip.findOneAndUpdate(
     {
       _id: tripID,
-      'budget.suggestions._id': budgetID
+      'budget.suggestions._id': suggestionID
     },
     { $pull: { 'budget.suggestions.$.voters': user._id } },
     { new: true }
   );
   return newTrip;
 };
+
+const lockTripAspect = async (aspect, tripID, suggestionID, user, Trip) => {
+  const trip = await Trip.findOne({ _id: user._id });
+  const suggestionIDs = trip[aspect]['suggestions'].map((suggestion) => String(suggestion._id));
+  if (!suggestionIDs.includes(String(suggestionID))) throw new Error('Suggestion with provided ID does not exist!');
+  if (String(trip.creator) === String(user._id)) {
+    return await Trip.findOneAndUpdate(
+      { _id: tripID },
+      {
+        [aspect + '.chosenSuggestion']: suggestionID,
+        [aspect + '.isLocked']: true
+      },
+      { new: true }
+    );
+  }
+};
+
+const unlockTripAspect = async (aspect, tripID, user, Trip) => {
+  const trip = await Trip.findOne({ _id: user._id });
+  if (String(trip.creator) === String(user._id)) {
+    const update = { [aspect + '.isLocked']: false };
+    if (!trip[aspect]['isDictated']) update[aspect + '.chosenSuggestion'] = null;
+    return await Trip.findOneAndUpdate({ _id: tripID }, update, { new: true });
+  }
+};
+
+export const lockDestination = (...args) => lockTripAspect('destination', ...args);
+export const lockTimeFrame = (...args) => lockTripAspect('timeFrame', ...args);
+export const lockBudget = (...args) => lockTripAspect('budget', ...args);
+
+export const unlockDestination = (...args) => unlockTripAspect('destination', ...args);
+export const unlockTimeFrame = (...args) => unlockTripAspect('timeFrame', ...args);
+export const unlockBudget = (...args) => unlockTripAspect('budget', ...args);

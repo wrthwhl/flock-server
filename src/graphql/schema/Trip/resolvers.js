@@ -1,4 +1,4 @@
-import { users, voters, creator } from '../resolver-helpers';
+import { users, voters, creator, chosenSuggestion } from '../resolver-helpers';
 import { PubSub, withFilter } from 'apollo-server';
 import {
   createTrip,
@@ -8,7 +8,13 @@ import {
   addOrVoteForBudget,
   removeVoteForDestination,
   removeVoteForTimeFrame,
-  removeVoteForBudget
+  removeVoteForBudget,
+  lockDestination,
+  lockTimeFrame,
+  lockBudget,
+  unlockDestination,
+  unlockTimeFrame,
+  unlockBudget
 } from '../../../controllers/trip.controller';
 const pubsub = new PubSub();
 
@@ -58,18 +64,48 @@ export default {
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
       return newTrip;
     },
-    removeVoteForDestination: async (_, { tripID, destinationID }, { Trip, user }) => {
-      const newTrip = removeVoteForDestination(tripID, destinationID, user, Trip);
+    removeVoteForDestination: async (_, { tripID, suggestionID }, { Trip, user }) => {
+      const newTrip = removeVoteForDestination(tripID, suggestionID, user, Trip);
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
       return newTrip;
     },
-    removeVoteForTimeFrame: async (_, { tripID, timeFrameID }, { Trip, user }) => {
-      const newTrip = removeVoteForTimeFrame(tripID, timeFrameID, user, Trip);
+    removeVoteForTimeFrame: async (_, { tripID, suggestionID }, { Trip, user }) => {
+      const newTrip = removeVoteForTimeFrame(tripID, suggestionID, user, Trip);
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
       return newTrip;
     },
-    removeVoteForBudget: async (_, { tripID, budgetID }, { Trip, user }) => {
-      const newTrip = removeVoteForBudget(tripID, budgetID, user, Trip);
+    removeVoteForBudget: async (_, { tripID, suggestionID }, { Trip, user }) => {
+      const newTrip = removeVoteForBudget(tripID, suggestionID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
+    },
+    lockDestination: async (_, { tripID, suggestionID }, { Trip, user }) => {
+      const newTrip = lockDestination(tripID, suggestionID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
+    },
+    lockTimeFrame: async (_, { tripID, suggestionID }, { Trip, user }) => {
+      const newTrip = lockTimeFrame(tripID, suggestionID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
+    },
+    lockBudget: async (_, { tripID, suggestionID }, { Trip, user }) => {
+      const newTrip = lockBudget(tripID, suggestionID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
+    },
+    unlockDestination: async (_, { tripID }, { Trip, user }) => {
+      const newTrip = unlockDestination(tripID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
+    },
+    unlockTimeFrame: async (_, { tripID }, { Trip, user }) => {
+      const newTrip = unlockTimeFrame(tripID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
+    },
+    unlockBudget: async (_, { tripID }, { Trip, user }) => {
+      const newTrip = unlockBudget(tripID, user, Trip);
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
       return newTrip;
     }
@@ -80,24 +116,21 @@ export default {
     creator
   },
   DestinationObject: {
-    chosenDestination: ({ chosenDestination, suggestions }) =>
-      chosenDestination && suggestions.find((destination) => String(chosenDestination) === String(destination._id))
+    chosenSuggestion
   },
   Destination: {
     voters,
     creator
   },
   BudgetObject: {
-    chosenBudget: ({ chosenBudget, suggestions }) =>
-      chosenBudget && suggestions.find((budget) => String(chosenBudget) === String(budget._id))
+    chosenSuggestion
   },
   Budget: {
     voters,
     creator
   },
   TimeFrameObject: {
-    chosenTimeFrame: ({ chosenTimeFrame, suggestions }) =>
-      chosenTimeFrame && suggestions.find((timeFrame) => String(chosenTimeFrame) === String(timeFrame._id))
+    chosenSuggestion
   },
   TimeFrame: {
     voters,

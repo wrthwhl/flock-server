@@ -13,6 +13,9 @@ export const voters = ({ voters }, _, { User }) => users(voters, User);
 
 export const creator = ({ creator }, _, { User }) => User.findOne(creator);
 
+export const chosenSuggestion = ({ chosenSuggestion, suggestions }) =>
+  chosenSuggestion && suggestions.find((suggestion) => String(chosenSuggestion) === String(suggestion._id));
+
 export const buildSuggestionsObj = (suggestions, userID) => {
   if (suggestions.length) {
     suggestions = suggestions.map((suggestion) => ({
