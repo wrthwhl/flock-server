@@ -17,7 +17,7 @@ extend type Mutation {
   voteForDestination(tripID: ID!, destinationID: ID!): Trip!
   addOrVoteForTimeFrame(tripID: ID!, timeFrames: [TimeFrameInput!]!): [Trip]!
   addDestination(tripID: ID, destination: DestinationObjectInput!): Trip!
-  leaveTrip(tripID: ID): User!
+  leaveTrip(tripID: ID): [Trip]
   removeParticipants(tripID: ID, participants: [String]): Trip!
 }
 

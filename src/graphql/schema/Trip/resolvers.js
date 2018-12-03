@@ -21,8 +21,10 @@ export default {
         () => pubsub.asyncIterator('OWN_TRIPS_CHANGED'),
         async (payload, _, { User, user: { email } }) => {
           const user = await User.findOne({ email });
+          const userThatLeavesTrip = await payload.userThatLeavesTrip;
+
           console.log('////// PAYLOAD', payload.userLeftTrip);
-          return payload._id === user._id.toString();
+          return userThatLeavesTrip._id.toString() === user._id.toString();
         }
       )
     }
@@ -183,36 +185,18 @@ export default {
     },
 
     leaveTrip: async (_, { tripID }, { Trip, User, user: { email } }) => {
+      // console.log(email);
       const userThatLeavesTrip = await User.findOne({ email });
-      console.log('///// USERLEAVESTRIP', userThatLeavesTrip);
       const tripThatWillBeLeft = await Trip.findOne({ _id: tripID });
+      // console.log(userThatLeavesTrip);
       const newParticipants = tripThatWillBeLeft.participants.filter(
-        (potentialLeaver) =>
-          console.log(potentialLeaver, userThatLeavesTrip._id.toString()) ||
-          potentialLeaver._id.toString() !== userThatLeavesTrip._id.toString()
+        (potentialLeaver) => potentialLeaver.toString() !== userThatLeavesTrip._id.toString()
       );
-      console.log('////// TRIPWILLBELEFT', newParticipants);
-      await Trip.findeOneAndUpdate({ _id: tripID }, { participants: newParticipants }, { new: true });
+      await Trip.findOneAndUpdate({ _id: tripID }, { $set: { participants: newParticipants } }, { new: true });
+      // await Trip.findeOneAndUpdate({ _id: tripID }, { $set: { participants: newParticipants } }, { new: true });
       const allTrips = await Trip.find({ participants: userThatLeavesTrip._id });
       console.log('///// ALLTRIPS', allTrips);
-      pubsub.publish('OWN_TRIPS_CHANGED', { ownTripsChanged: allTrips });
-      return allTrips;
-    },
-
-    leaveTrip: async (_, { tripID }, { Trip, User, user: { email } }) => {
-      const userThatLeavesTrip = await User.findOne({ email });
-      console.log('///// USERLEAVESTRIP', userThatLeavesTrip);
-      const tripThatWillBeLeft = await Trip.findOne({ _id: tripID });
-      const newParticipants = tripThatWillBeLeft.participants.filter(
-        (potentialLeaver) =>
-          console.log(potentialLeaver, userThatLeavesTrip._id.toString()) ||
-          potentialLeaver._id.toString() !== userThatLeavesTrip._id.toString()
-      );
-      console.log('////// TRIPWILLBELEFT', newParticipants);
-      await Trip.findeOneAndUpdate({ _id: tripID }, { participants: newParticipants }, { new: true });
-      const allTrips = await Trip.find({ participants: userThatLeavesTrip._id });
-      console.log('///// ALLTRIPS', allTrips);
-      pubsub.publish('OWN_TRIPS_CHANGED', { ownTripsChanged: allTrips });
+      pubsub.publish('OWN_TRIPS_CHANGED', { ownTripsChanged: allTrips, userThatLeavesTrip });
       return allTrips;
     },
 
