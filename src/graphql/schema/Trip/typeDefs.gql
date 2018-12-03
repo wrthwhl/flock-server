@@ -12,7 +12,7 @@ extend type Mutation {
   removeVoteForDestination(tripID: ID!, destinationID: ID!): Trip!
   removeVoteForTimeFrame(tripID: ID!, timeFrameID: ID!): Trip!
   removeVoteForBudget(tripID: ID!, budgetID: ID!): Trip!
-  lockDestination(tripID: ID!, destinationID: ID!): Trip!
+  lockDestination(tripID: ID!, suggestionID: ID!): Trip!
 }
 
 extend type Subscription {
@@ -33,7 +33,7 @@ type Trip {
 type DestinationObject {
   isDictated: Boolean
   isLocked: Boolean
-  chosenDestination: Destination
+  chosenSuggestion: Destination
   suggestions: [Destination]!
 }
 
@@ -47,7 +47,7 @@ type Destination {
 type BudgetObject {
   isDictated: Boolean
   isLocked: Boolean
-  chosenBudget: Budget
+  chosenSuggestion: Budget
   suggestions: [Budget]!
 }
 
@@ -61,7 +61,7 @@ type Budget {
 type TimeFrameObject {
   isDictated: Boolean
   isLocked: Boolean
-  chosenTimeFrame: TimeFrame
+  chosenSuggestion: TimeFrame
   suggestions: [TimeFrame]!
 }
 
