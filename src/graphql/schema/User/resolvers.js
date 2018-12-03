@@ -9,10 +9,8 @@ export default {
     userUpdated: {
       subscribe: withFilter(
         () => pubsub.asyncIterator('USER_UPDATED'),
-        async (payload, _, { User, user: { email } }) => {
-          const user = await User.findOne({ email });
-          console.log('////// PAYLOAD', payload.userLeftTrip);
-          return payload._id === user._id.toString();
+        (payload, variables) => {
+          return payload.userUpdated.email === variables.filteredEmail;
         }
       )
     }
