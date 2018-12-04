@@ -27,18 +27,21 @@ const TripSchema = new Schema({
   creator: ObjectID,
   createdAt: { type: Date, default: Date.now },
   destination: {
-    isDictated: { type: Boolean, required: true },
-    chosenDestination: ObjectID,
+    isDictated: { type: Boolean, required: true, default: false },
+    isLocked: { type: Boolean, default: false },
+    chosenSuggestion: ObjectID,
     suggestions: { type: [ DestinationSchema ], required: true }
   },
   budget: {
-    isDictated: Boolean,
-    chosenBudget: ObjectID,
+    isDictated: { type: Boolean, required: true, default: false },
+    isLocked: { type: Boolean, default: false },
+    chosenSuggestion: ObjectID,
     suggestions: [ BudgetSchema ]
   },
   timeFrame: {
-    isDictated: Boolean,
-    chosenTimeFrame: String,
+    isDictated: { type: Boolean, required: true, default: false },
+    isLocked: { type: Boolean, default: false },
+    chosenSuggestion: String,
     suggestions: [ TimeFrameSchema ]
   }
 });
@@ -94,7 +97,7 @@ const Trip = mongoose.model('trips', TripSchema);
     },
     timeFrame: {
       isDictated: true,
-      chosenTimeFrame: '000000000000000000000000',
+      chosenSuggestion: '000000000000000000000000',
       suggestions: [
         {
           _id: '000000000000000000000000',
