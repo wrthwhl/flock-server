@@ -41,8 +41,7 @@ export default {
       //this should be an enviromental variable but will be kept here for now for checking
       const serverAccessToken = '295087824459443|ierZVxTgM2AUv0aBDR4j2jCLeno';
       const uri = `https://graph.facebook.com/debug_token?input_token=${accessToken}&access_token=${serverAccessToken}`;
-      let verification = await fetch (uri);
-      verification =  await verification.json();
+      const verification = await fetch(uri).then(res => res.json());
       if (verification.data.is_valid && verification.data.user_id === userID) {
         try {
           const currentUser = await User.findOneAndUpdate({ email }, { email, ...user }, { upsert: true, new: true });
@@ -53,7 +52,6 @@ export default {
         }
       }
       else {
-        console.log('error'); // eslint-disable-line no-console
         throw new AuthenticationError();
       }
     },
