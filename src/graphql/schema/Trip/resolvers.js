@@ -124,11 +124,29 @@ export default {
         throw new Error(e);
       }
     },
-    toggleDictator: async (_, { tripID, property }, { Trip }) => {
-      return await Trip.findOne({ _id: tripID }, (err, doc) => {
-        doc[property].isDictated = !doc[property].isDictated;
+    toggleBudgetDictator: async (_, { tripID }, { Trip }) => {
+      const newTrip = await Trip.findOne({ _id: tripID }, (err, doc) => {
+        doc.budget.isDictated = !doc.budget.isDictated;
         doc.save();
       });
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
+    },
+    toggleDestinationDictator: async (_, { tripID }, { Trip }) => {
+      const newTrip = await Trip.findOne({ _id: tripID }, (err, doc) => {
+        doc.destination.isDictated = !doc.destination.isDictated;
+        doc.save();
+      });
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
+    },
+    toggleTimeFrameDictator: async (_, { tripID }, { Trip }) => {
+      const newTrip = await Trip.findOne({ _id: tripID }, (err, doc) => {
+        doc.timeFrame.isDictated = !doc.timeFrame.isDictated;
+        doc.save();
+      });
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
     }
   },
 
