@@ -172,7 +172,7 @@ export const removeVoteForBudget = async (tripID, suggestionID, user, Trip) => {
 };
 
 const lockTripAspect = async (aspect, tripID, suggestionID, user, Trip) => {
-  const trip = await Trip.findOne({ _id: user._id });
+  const trip = await Trip.findOne({ _id: tripID });
   const suggestionIDs = trip[aspect]['suggestions'].map((suggestion) => String(suggestion._id));
   if (!suggestionIDs.includes(String(suggestionID))) throw new Error('Suggestion with provided ID does not exist!');
   if (String(trip.creator) === String(user._id)) {
@@ -188,7 +188,7 @@ const lockTripAspect = async (aspect, tripID, suggestionID, user, Trip) => {
 };
 
 const unlockTripAspect = async (aspect, tripID, user, Trip) => {
-  const trip = await Trip.findOne({ _id: user._id });
+  const trip = await Trip.findOne({ _id: tripID });
   if (String(trip.creator) === String(user._id)) {
     const update = { [aspect + '.isLocked']: false };
     if (!trip[aspect]['isDictated']) update[aspect + '.chosenSuggestion'] = null;
