@@ -33,7 +33,7 @@ export const sendEmail = ({ trip, user }) => {
         trip.name
       }</b> by ${
         user.email
-      }.</br>Please click on the following link to confirm your account.</br></br>Thank you for joining Flock. </br>Your Flock Team!</p>`
+      }.</br>Please click on the following link to confirm your account: <a href>http://localhost:3000/</a></br></br>Thank you for joining Flock. </br>Your Flock Team!</p>`
     };
 
     transporter.sendMail(message, (err, info) => {
