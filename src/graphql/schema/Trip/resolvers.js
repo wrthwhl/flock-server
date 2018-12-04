@@ -123,6 +123,12 @@ export default {
       } catch (e) {
         throw new Error(e);
       }
+    },
+    toggleDictator: async (_, { tripID, property }, { Trip }) => {
+      return await Trip.findOne({ _id: tripID }, (err, doc) => {
+        doc[property].isDictated = !doc[property].isDictated;
+        doc.save();
+      });
     }
   },
 
