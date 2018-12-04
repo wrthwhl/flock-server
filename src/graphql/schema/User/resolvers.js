@@ -44,6 +44,7 @@ export default {
       }
     },
     facebook: async (_, { email, accessToken, userID, user = {} }, { User }) => {
+      // TODO consider caching facebook token
       const uri = `https://graph.facebook.com/debug_token?input_token=${accessToken}&access_token=${config.facebook
         .serverAccessToken}`;
       const verification = await fetch(uri).then((res) => res.json());
