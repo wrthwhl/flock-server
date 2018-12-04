@@ -1,5 +1,5 @@
-export const buildSuggestionsObj = (suggestions, userID) => {
-  if (suggestions.length) {
+export const buildSuggestionsObj = (suggestions = [], userID) => {
+  if (suggestions && suggestions.length) {
     suggestions = suggestions.map((suggestion) => ({
       ...suggestion,
       voters: [ userID ],
