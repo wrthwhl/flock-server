@@ -158,6 +158,49 @@ describe('trip resolvers', () => {
       }
     });
   });
+
+  test('addParticipants', async () => {
+    const response = await axios.post('http://localhost:4000/graphql', {
+      query: `
+        mutation{
+          addParticipants(tripID:  "000000000000000000000000", participants: "anne@flock.io")
+          {
+            participants{
+              email
+            }
+          }
+        }
+        `
+    });
+
+    const { data } = response;
+    expect(data).toMatchObject({
+      data: {
+        addParticipants: {
+          participants: [
+            {
+              email: 'damien@flock.io'
+            },
+            {
+              email: 'christopher@flock.io'
+            },
+            {
+              email: 'berta@flock.io'
+            },
+            {
+              email: 'arturo@flock.io'
+            },
+            {
+              email: 'marco@flock.io'
+            },
+            {
+              email: 'anne@flock.io'
+            }
+          ]
+        }
+      }
+    });
+  });
 });
 
 // describe('user resolvers', () => {
