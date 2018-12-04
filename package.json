@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "apollo-server": "^2.2.2",
+    "axios": "^0.18.0",
     "bcrypt": "^3.0.2",
     "graphql": "^14.0.2",
     "jsonwebtoken": "^8.4.0",
@@ -13,7 +14,8 @@
     "mongoose": "^5.3.13",
     "nodemailer": "^4.7.0",
     "nodemailer-wrapper": "^1.2.0",
-    "nodemon": "^1.18.7"
+    "nodemon": "^1.18.7",
+    "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.5",

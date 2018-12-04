@@ -3,6 +3,7 @@ import { XMLHttpRequest } from 'xmlhttprequest';
 
 global.XMLHttpRequest = XMLHttpRequest;
 
+<<<<<<< HEAD
 describe('trip resolvers', () => {
   test('create trip', async () => {
     const response = await axios.post('http://localhost:4000/graphql', {
@@ -33,6 +34,17 @@ describe('trip resolvers', () => {
             firstName
             lastName
           }
+=======
+describe('user resolvers', () => {
+  test('allUsers', async () => {
+    const response = await axios.post('http://localhost:4000/graphql', {
+      query: `
+      query {
+        allUsers {
+          firstName
+          lastName
+          email
+>>>>>>> add a tests file with graphql test
         }
       }
       `
@@ -41,6 +53,7 @@ describe('trip resolvers', () => {
     const { data } = response;
     expect(data).toMatchObject({
       data: {
+<<<<<<< HEAD
         createTrip: {
           name: 'Voyage des seniors dev',
           participants: [
@@ -91,10 +104,45 @@ describe('trip resolvers', () => {
             ]
           }
         }
+=======
+        allUsers: [
+          { email: 'damien@flock.io', firstName: 'Damien', lastName: 'Derail' },
+          {
+            email: 'christopher@flock.io',
+            firstName: 'Christopher',
+            lastName: 'Bücklein'
+          },
+          { email: 'berta@flock.io', firstName: 'Berta', lastName: 'Cume' },
+          {
+            email: 'arturo@flock.io',
+            firstName: 'Arturo',
+            lastName: 'Moreira Santos'
+          },
+          { email: 'marco@flock.io', firstName: 'Marco', lastName: 'Kunz' },
+          {
+            email: 'damien1@flock.io',
+            firstName: 'Damien1',
+            lastName: 'Derail'
+          },
+          {
+            email: 'christopher1@flock.io',
+            firstName: 'Christopher1',
+            lastName: 'Bücklein'
+          },
+          { email: 'berta1@flock.io', firstName: 'Berta1', lastName: 'Cume' },
+          {
+            email: 'arturo1@flock.io',
+            firstName: 'Arturo1',
+            lastName: 'Moreira Santos'
+          },
+          { email: 'marco1@flock.io', firstName: 'Marco1', lastName: 'Kunz' }
+        ]
+>>>>>>> add a tests file with graphql test
       }
     });
   });
 
+<<<<<<< HEAD
   test('addOrVoteForTimeFrame', async () => {
     const response = await axios.post('http://localhost:4000/graphql', {
       query: `
@@ -169,11 +217,48 @@ describe('trip resolvers', () => {
           }
         }
         `
+=======
+  test('create trip', async () => {
+    const response = await axios.post('http://localhost:4000/graphql', {
+      query: `
+      mutation{
+        createTrip( trip: {
+  name:"Voyage des seniors dev",
+  participants:["berta@flock.io", "christopher@flock.io"],
+  destination:{
+    isDictated: true,
+    suggestions:[{name: "Palma de Mallorca"}]
+  },
+  budget: {suggestions: [{value: 100}]},
+	timeFrame: {
+    isDictated: false,
+   suggestions: [
+    {
+      startDate: "2018-12-24",
+      endDate: "2018-12-25"
+    }
+  ]
+  }
+})
+  {
+
+    name
+    participants{
+      email
+      firstName
+      lastName
+
+    }
+  }
+      }
+      `
+>>>>>>> add a tests file with graphql test
     });
 
     const { data } = response;
     expect(data).toMatchObject({
       data: {
+<<<<<<< HEAD
         addParticipants: {
           participants: [
             {
@@ -193,6 +278,20 @@ describe('trip resolvers', () => {
             },
             {
               email: 'barbara@flock.io'
+=======
+        createTrip: {
+          name: 'Voyage des seniors dev',
+          participants: [
+            {
+              email: 'christopher@flock.io',
+              firstName: 'Christopher',
+              lastName: 'Bücklein'
+            },
+            {
+              email: 'berta@flock.io',
+              firstName: 'Berta',
+              lastName: 'Cume'
+>>>>>>> add a tests file with graphql test
             }
           ]
         }
@@ -200,6 +299,7 @@ describe('trip resolvers', () => {
     });
   });
 
+<<<<<<< HEAD
   test('remove vote for destination', async () => {
     const response = await axios.post('http://localhost:4000/graphql', {
       query: `mutation{
@@ -369,11 +469,27 @@ describe('user resolvers', () => {
   //           }
   //         }
   //         `
+=======
+  // test('create user', async () => {
+  //   const response = await axios.post('http://localhost:4000/graphql', {
+  //     query: `
+  //     mutation {
+  //       register(email: "testuser@testuser.com", password: "tester", user: {firstName: 'test', lastName: 'user'}) {
+  //         {
+  //           firstName
+  //           lastName
+  //           email
+  //         }
+  //       }
+  //     }
+  //     `
+>>>>>>> add a tests file with graphql test
   //   });
   //
   //   const { data } = response;
   //   expect(data).toMatchObject({
   //     data: {
+<<<<<<< HEAD
   //       allUsers: [
   //         {
   //           firstName: 'Damien',
@@ -439,20 +555,38 @@ describe('user resolvers', () => {
   //   expect(data).toMatchObject({
   //     data: {
   //       register: {}
+=======
+  //       register: {
+  //         user: {
+  //           firstName: 'test',
+  //           lastName: 'user',
+  //           email: 'testuser@testuser.com'
+  //         }
+  //       }
+>>>>>>> add a tests file with graphql test
   //     }
   //   });
   //
   //   const response2 = await axios.post('http://localhost:4000/graphql', {
   //     query: `
   //     mutation {
+<<<<<<< HEAD
   //       login(email: "testuser@testuser.com", password: "tester")
   //     }
   //
+=======
+  //       login(email: "testuser@testuser.com", password: "tester") {
+  //         token
+  //         refreshToken
+  //       }
+  //     }
+>>>>>>> add a tests file with graphql test
   //     `
   //   });
   //
   //   const {
   //     data: {
+<<<<<<< HEAD
   //       login: { token }
   //     }
   //   } = response2.data;
@@ -489,5 +623,42 @@ describe('user resolvers', () => {
   //       }
   //     }
   //   });
+=======
+  //       login: { token, refreshToken }
+  //     }
+  //   } = response2.data;
+
+  // const response3 = await axios.post(
+  //   'http://localhost:4000/graphql',
+  //   {
+  //     query: `
+  //   mutation {
+  //     createTeam(name: "team1") {
+  //       ok
+  //       team {
+  //         name
+  //       }
+  //     }
+  //   }
+  //   `
+  //   },
+  //   {
+  //     headers: {
+  //       'x-token': token,
+  //       'x-refresh-token': refreshToken
+  //     }
+  //   }
+  // );
+
+  // expect(response3.data).toMatchObject({
+  //   data: {
+  //     createTeam: {
+  //       ok: true,
+  //       team: {
+  //         name: 'team1'
+  //       }
+  //     }
+  //   }
+>>>>>>> add a tests file with graphql test
   // });
 });
