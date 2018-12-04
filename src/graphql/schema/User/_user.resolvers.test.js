@@ -20,6 +20,11 @@ describe('user', () => {
       '$2b$12$D2IkUfk1IFnomxPOec6yDeYhfg54bK051/TJYt8sI9GzyWN.maUTi'
     );
   });
+  test('user must be linked to and id', async () => {
+    expect(user._id).toBeTruthy();
+    expect(user._id).toMatch(/000000000000000000000000/);
+    expect(user._id).not.toBeUndefined();
+  });
 });
 
 const user = {
