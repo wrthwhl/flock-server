@@ -1,5 +1,4 @@
 extend type Query {
-  allUsers: [User]!
   self: User!
 }
 

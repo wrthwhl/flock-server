@@ -11,7 +11,6 @@ export default {
         () => pubsub.asyncIterator('USER_UPDATED'),
         async (payload, _, { User, user: { email } }) => {
           const user = await User.findOne({ email });
-          console.log('////// PAYLOAD', payload.userLeftTrip);
           return payload._id === user._id.toString();
         }
       )
@@ -21,8 +20,7 @@ export default {
     self: (_, __, { User, user: { email } }) => {
       if (!email) throw new AuthenticationError();
       return User.findOne({ email });
-    },
-    allUsers: (_, __, { User }) => User.find()
+    }
   },
 
   Mutation: {
