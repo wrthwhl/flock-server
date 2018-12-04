@@ -33,10 +33,14 @@ export default {
     },
     register: async (_, { email, password, user: userInput = {} }, { User }) => {
       let currentUser = await User.findOne({ email });
-      if (currentUser) throw new Error('User already exists. Try login instead!');
+      if (currentUser.password) throw new Error('User already exists. Try login instead!');
       password = await bcrypt.hash(password, 12);
       try {
-        currentUser = await User.create({ email, password, ...userInput });
+        currentUser = await User.findOneAndUpdate(
+          { email },
+          { email, password, ...userInput },
+          { new: true, upsert: true }
+        );
         return getJWT({ _id: currentUser._id, email: currentUser.email });
       } catch (err) {
         console.error(err); // eslint-disable-line no-console
