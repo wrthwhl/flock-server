@@ -266,6 +266,71 @@ describe('trip resolvers', () => {
       }
     });
   });
+
+  test('add vote for destination', async () => {
+    const response = await axios.post('http://localhost:4000/graphql', {
+      query: `
+        mutation{
+          addOrVoteForDestination(tripID:"000000000000000000000000", destinations: {name: "Zurich"})
+            {
+              destination{
+                suggestions{
+                name
+                voters{
+                  email
+                  }
+              }
+            }
+          }
+        }
+      `
+    });
+
+    const { data } = response;
+    expect(data).toMatchObject({
+      data: {
+        addOrVoteForDestination: {
+          destination: {
+            suggestions: [
+              {
+                name: 'Barcelona',
+                voters: [
+                  {
+                    email: 'damien@flock.io'
+                  },
+                  {
+                    email: 'berta@flock.io'
+                  }
+                ]
+              },
+              {
+                name: 'Berlin',
+                voters: [
+                  {
+                    email: 'damien@flock.io'
+                  },
+                  {
+                    email: 'berta@flock.io'
+                  }
+                ]
+              },
+              {
+                name: 'Zurich',
+                voters: [
+                  {
+                    email: 'berta@flock.io'
+                  },
+                  {
+                    email: 'marco@flock.io'
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    });
+  });
 });
 
 // describe('user resolvers', () => {
