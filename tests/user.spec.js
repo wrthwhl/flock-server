@@ -9,33 +9,31 @@ describe('trip resolvers', () => {
       query: `
       mutation{
         createTrip( trip: {
-  name:"Voyage des seniors dev",
-  participants:["berta@flock.io", "christopher@flock.io"],
-  destination:{
-    isDictated: true,
-    suggestions:[{name: "Palma de Mallorca"}]
-  },
-  budget: {suggestions: [{value: 100}]},
-	timeFrame: {
-    isDictated: false,
-   suggestions: [
-    {
-      startDate: "2018-12-24",
-      endDate: "2018-12-25"
-    }
-  ]
-  }
-})
-  {
-
-    name
-    participants{
-      email
-      firstName
-      lastName
-
-    }
-  }
+          name:"Voyage des seniors dev",
+          participants:["berta@flock.io", "christopher@flock.io"],
+          destination:{
+            isDictated: true,
+            suggestions:[{name: "Palma de Mallorca"}]
+          },
+          budget: {suggestions: [{value: 100}]},
+        	timeFrame: {
+            isDictated: false,
+           suggestions: [
+            {
+              startDate: "2018-12-24",
+              endDate: "2018-12-25"
+            }
+          ]
+          }
+        })
+        {
+          name
+          participants{
+            email
+            firstName
+            lastName
+          }
+        }
       }
       `
     });
@@ -65,16 +63,16 @@ describe('trip resolvers', () => {
   test('addOrVoteForBudget', async () => {
     const response = await axios.post('http://localhost:4000/graphql', {
       query: `
-      mutation{
-  addOrVoteForBudget(tripID:  "000000000000000000000000", budget: {value: 100})
-  {
-    budget{
-      suggestions{
-       value
-      }
-    }
-  }
-}
+        mutation{
+          addOrVoteForBudget(tripID:  "000000000000000000000000", budget: {value: 100})
+          {
+            budget{
+              suggestions{
+               value
+              }
+            }
+          }
+        }
       `
     });
 
@@ -197,6 +195,73 @@ describe('trip resolvers', () => {
               email: 'anne@flock.io'
             }
           ]
+        }
+      }
+    });
+  });
+
+  test('remove vote for destination', async () => {
+    const response = await axios.post('http://localhost:4000/graphql', {
+      query: `mutation{
+          removeVoteForDestination(tripID:"000000000000000000000000", destinationID: "111111111111111111111111")
+        {
+          destination{
+            suggestions{
+              id
+              name
+              voters{
+                email
+                }
+              }
+            }
+        }
+      }`
+    });
+
+    const { data } = response;
+    expect(data).toMatchObject({
+      data: {
+        removeVoteForDestination: {
+          destination: {
+            suggestions: [
+              {
+                id: '000000000000000000000000',
+                name: 'Barcelona',
+                voters: [
+                  {
+                    email: 'damien@flock.io'
+                  },
+                  {
+                    email: 'berta@flock.io'
+                  }
+                ]
+              },
+              {
+                id: '111111111111111111111111',
+                name: 'Berlin',
+                voters: [
+                  {
+                    email: 'damien@flock.io'
+                  },
+                  {
+                    email: 'berta@flock.io'
+                  }
+                ]
+              },
+              {
+                id: '222222222222222222222222',
+                name: 'Zurich',
+                voters: [
+                  {
+                    email: 'berta@flock.io'
+                  },
+                  {
+                    email: 'marco@flock.io'
+                  }
+                ]
+              }
+            ]
+          }
         }
       }
     });
