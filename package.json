@@ -58,5 +58,19 @@
   "bugs": {
     "url": "https://github.com/mrcknz/gtpe-server/issues"
   },
-  "homepage": "https://github.com/mrcknz/gtpe-server#readme"
+  "homepage": "https://github.com/mrcknz/gtpe-server#readme",
+  "jest": {
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "./dist"
+    ],
+    "coverageReporters": [
+      "lcov",
+      "html"
+    ],
+    "moduleNameMapper": {
+      "^mongoose$": "<rootDir>/node_modules/mongoose"
+    }
+  }
 }
