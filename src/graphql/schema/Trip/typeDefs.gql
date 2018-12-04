@@ -96,7 +96,7 @@ input DestinationInput {
 }
 
 input BudgetObjectInput {
-  suggestions: [BudgetInput!]!
+  suggestions: [BudgetInput]!
   isDictated: Boolean
 }
 
