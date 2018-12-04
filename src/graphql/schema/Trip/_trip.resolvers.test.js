@@ -30,6 +30,9 @@ describe('destination', () => {
     expect(trip.destination.suggestions[0].name).toEqual('Barcelona');
     expect(trip.destination.suggestions[0].creator).toHaveLength(24);
     expect(trip.destination.suggestions[0].creator).toBeDefined();
+    expect(trip.destination.suggestions[0].voters).toContain(
+      '222222222222222222222222'
+    );
   });
   test('a budget suggestion must be of a type number', async () => {
     expect(trip.budget.suggestions[0].value).toEqual(500);
