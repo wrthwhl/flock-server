@@ -21,6 +21,12 @@ const TimeFrameSchema = new Schema({
   creator: ObjectID
 });
 
+const MessageSchema = new Schema({
+  createdAt: { type: Date, default: Date.now },
+  creator: ObjectID,
+  message: String
+});
+
 const TripSchema = new Schema({
   name: { type: String, required: true },
   participants: { type: [ ObjectID ], required: true },
@@ -43,7 +49,8 @@ const TripSchema = new Schema({
     isLocked: { type: Boolean, default: false },
     chosenSuggestion: String,
     suggestions: [ TimeFrameSchema ]
-  }
+  },
+  messages: [ MessageSchema ]
 });
 
 const Trip = mongoose.model('trips', TripSchema);

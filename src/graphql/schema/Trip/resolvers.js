@@ -108,6 +108,21 @@ export default {
       const newTrip = unlockBudget(tripID, user, Trip);
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
       return newTrip;
+    },
+    addChatMessage: async (_, { tripID, message }, { Trip, user }) => {
+      try {
+        const newTrip = await Trip.findOneAndUpdate(
+          {
+            _id: tripID
+          },
+          { $push: { messages: { message, creator: user._id } } },
+          { new: true }
+        );
+        pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+        return newTrip;
+      } catch (e) {
+        throw new Error(e);
+      }
     }
   },
 
@@ -134,6 +149,9 @@ export default {
   },
   TimeFrame: {
     voters,
+    creator
+  },
+  MessageObject: {
     creator
   }
 };

@@ -18,6 +18,7 @@ extend type Mutation {
   unlockDestination(tripID: ID!): Trip!
   unlockTimeFrame(tripID: ID!): Trip!
   unlockBudget(tripID: ID!): Trip!
+  addChatMessage(tripID: ID!, message: String!): Trip!
 }
 
 extend type Subscription {
@@ -33,6 +34,13 @@ type Trip {
   budget: BudgetObject!
   timeFrame: TimeFrameObject
   createdAt: Date!
+  messages: [MessageObject]
+}
+
+type MessageObject {
+  createdAt: Date
+  creator: User!
+  message: String!
 }
 
 type DestinationObject {
