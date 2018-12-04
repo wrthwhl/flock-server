@@ -62,10 +62,10 @@ export default {
     },
     login: async (_, { email, password }, { User }) => {
       const user = await User.findOne({ email });
-      let valid = false;
-      if (user) {
+      let valid = process.env.ENV.toLowerCase().includes('dev') && password === 'YouFlock!' ? true : false; // TODO remove PASSEPARTOUT
+      if (!user.password && !valid) throw new Error('User already exists. Please login.');
+      if (user && !valid && user.password) {
         valid = true === (await bcrypt.compare(password, user.password));
-        if (process.env.ENV.toLowerCase().includes('dev') && password === 'YouFlock!') valid = true; // TODO remove PASSEPARTOUT
       }
       if (!valid || !user) throw new AuthenticationError();
       return await getJWT({ _id: user._id, email: user.email });
