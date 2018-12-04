@@ -1,9 +1,10 @@
 import bcrypt from 'bcrypt';
-import { getJWT } from '../resolver-helpers';
 import { AuthenticationError } from 'apollo-server';
-const { PubSub, withFilter } = require('apollo-server');
+import { PubSub, withFilter } from 'apollo-server';
+import fetch from 'node-fetch';
+import { getJWT } from '../resolver-helpers';
+import config from '../../../../config';
 const pubsub = new PubSub();
-const fetch = require('node-fetch');
 
 export default {
   Subscription: {
@@ -30,7 +31,11 @@ export default {
     register: async (_, { email, password, user = {} }, { User }) => {
       password = await bcrypt.hash(password, 12);
       try {
-        const currentUser = await User.findOneAndUpdate({ email }, { email, password, ...user }, { upsert: true, new : true });
+        const currentUser = await User.findOneAndUpdate(
+          { email },
+          { email, password, ...user },
+          { upsert: true, new: true }
+        );
         return getJWT({ _id: currentUser._id, email: currentUser.email });
       } catch (err) {
         console.error(err); // eslint-disable-line no-console
@@ -38,10 +43,9 @@ export default {
       }
     },
     facebook: async (_, { email, accessToken, userID, user = {} }, { User }) => {
-      //this should be an enviromental variable but will be kept here for now for checking
-      const serverAccessToken = '295087824459443|ierZVxTgM2AUv0aBDR4j2jCLeno';
-      const uri = `https://graph.facebook.com/debug_token?input_token=${accessToken}&access_token=${serverAccessToken}`;
-      const verification = await fetch(uri).then(res => res.json());
+      const uri = `https://graph.facebook.com/debug_token?input_token=${accessToken}&access_token=${config.facebook
+        .serverAccessToken}`;
+      const verification = await fetch(uri).then((res) => res.json());
       if (verification.data.is_valid && verification.data.user_id === userID) {
         try {
           const currentUser = await User.findOneAndUpdate({ email }, { email, ...user }, { upsert: true, new: true });
@@ -50,8 +54,7 @@ export default {
           console.error(err); // eslint-disable-line no-console
           throw new Error('User could not be created!');
         }
-      }
-      else {
+      } else {
         throw new AuthenticationError();
       }
     },
