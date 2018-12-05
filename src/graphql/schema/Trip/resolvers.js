@@ -14,7 +14,11 @@ import {
   lockBudget,
   unlockDestination,
   unlockTimeFrame,
-  unlockBudget
+  unlockBudget,
+  writeBudetMessage,
+  writeGeneralMessage,
+  writeTimeFrameMessage,
+  writeDestinationMessage
 } from '../../../controllers/trip.controller';
 const pubsub = new PubSub();
 
@@ -109,20 +113,25 @@ export default {
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
       return newTrip;
     },
-    addChatMessage: async (_, { tripID, message }, { Trip, user }) => {
-      try {
-        const newTrip = await Trip.findOneAndUpdate(
-          {
-            _id: tripID
-          },
-          { $push: { messages: { message, creator: user._id } } },
-          { new: true }
-        );
-        pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-        return newTrip;
-      } catch (e) {
-        throw new Error(e);
-      }
+    addGeneralMessage: async (_, { tripID, message }, { Trip, user }) => {
+      const newTrip = await writeGeneralMessage(tripID, message, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
+    },
+    addBudgetMessage: async (_, { tripID, message }, { Trip, user }) => {
+      const newTrip = await writeBudetMessage(tripID, message, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
+    },
+    addTimeFrameMessage: async (_, { tripID, message }, { Trip, user }) => {
+      const newTrip = await writeTimeFrameMessage(tripID, message, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
+    },
+    addDestinationMessage: async (_, { tripID, message }, { Trip, user }) => {
+      const newTrip = await writeDestinationMessage(tripID, message, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      return newTrip;
     },
     toggleBudgetDictator: async (_, { tripID }, { Trip }) => {
       const newTrip = await Trip.findOne({ _id: tripID }, (err, doc) => {

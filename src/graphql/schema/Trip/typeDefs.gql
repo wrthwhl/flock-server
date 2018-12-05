@@ -20,6 +20,13 @@ extend type Mutation {
   unlockBudget(tripID: ID!): Trip!
   addChatMessage(tripID: ID!, message: String!): Trip!
   toggleDictator(tripID: ID!, property: String!): Trip!
+  addGeneralMessage(tripID: ID!, message: String!): Trip!
+  addTimeFrameMessage(tripID: ID!, message: String!): Trip!
+  addBudgetMessage(tripID: ID!, message: String!): Trip!
+  addDestinationMessage(tripID: ID!, message: String!): Trip!
+  toggleBudgetDictator(tripID: ID!): Trip!
+  toggleDestinationDictator(tripID: ID!): Trip!
+  toggleTimeFrameDictator(tripID: ID!): Trip!
 }
 
 extend type Subscription {
@@ -42,6 +49,14 @@ type MessageObject {
   createdAt: Date
   creator: User!
   message: String!
+  type: MessageType!
+}
+
+enum MessageType {
+  TRIP
+  DESTINATION
+  TIMEFRAME
+  BUDGET
 }
 
 type DestinationObject {

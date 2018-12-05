@@ -24,7 +24,8 @@ const TimeFrameSchema = new Schema({
 const MessageSchema = new Schema({
   createdAt: { type: Date, default: Date.now },
   creator: ObjectID,
-  message: String
+  message: String,
+  type: String
 });
 
 const TripSchema = new Schema({
