@@ -36,6 +36,13 @@ export default {
       subscriptions: {
         onConnect: async (headers) => {
           const user = await getJWTPayload(headers, SECRET);
+          const err = new AuthenticationError(
+            'Request contains invalid authorization header. Bearer token with valid JWT expected.'
+          );
+          if (!user.email || !user._id) {
+            console.error(err); //eslint-disable-line no-console
+            throw err;
+          }
           return { user };
         }
       }
