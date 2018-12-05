@@ -14,6 +14,9 @@ export const createTrip = async (trip, user, { Trip, User }) => {
   } = trip;
   let { participants } = trip;
 
+  if (budget && budget.suggestions && budget.suggestions.length > 1)
+    throw new Error('Multiple budget suggestions received, only one suggestion allowed.');
+
   participants = await Promise.all(
     participants.map(async (email) => {
       const user = await User.findOneAndUpdate({ email }, { email }, { upsert: true, new: true });
@@ -123,18 +126,34 @@ export const addOrVoteForTimeFrame = async (tripID, timeFrames, user, { Trip }) 
 
 export const addOrVoteForBudget = async (tripID, budget, user, { Trip }) => {
   budget = buildSuggestionsObj([ budget ], user._id)[0];
-  let trip = await Trip.findOneAndUpdate(
+  let updatedTrip = await Trip.findOneAndUpdate(
+    {
+      _id: tripID
+    },
+    {
+      $pull: { 'budget.suggestions.$[].voters': user._id }
+    },
+    {
+      new: true
+    }
+  );
+  updatedTrip = await Trip.findOneAndUpdate(
     {
       _id: tripID,
       'budget.suggestions.value': budget.value
     },
-    { $addToSet: { 'budget.suggestions.$.voters': user._id } },
-    { new: true }
+    {
+      $addToSet: { 'budget.suggestions.$.voters': user._id }
+    },
+    {
+      new: true
+    }
   );
-  if (!trip) trip = Trip.findOneAndUpdate({ _id: tripID }, { $push: { 'budget.suggestions': budget } }, { new: true });
+  if (!updatedTrip)
+    updatedTrip = Trip.findOneAndUpdate({ _id: tripID }, { $push: { 'budget.suggestions': budget } }, { new: true });
 
-  pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: trip });
-  return trip;
+  pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+  return updatedTrip;
 };
 
 export const removeVoteForDestination = async (tripID, suggestionID, user, Trip) => {
@@ -172,7 +191,7 @@ export const removeVoteForBudget = async (tripID, suggestionID, user, Trip) => {
 };
 
 const lockTripAspect = async (aspect, tripID, suggestionID, user, Trip) => {
-  const trip = await Trip.findOne({ _id: user._id });
+  const trip = await Trip.findOne({ _id: tripID });
   const suggestionIDs = trip[aspect]['suggestions'].map((suggestion) => String(suggestion._id));
   if (!suggestionIDs.includes(String(suggestionID))) throw new Error('Suggestion with provided ID does not exist!');
   if (String(trip.creator) === String(user._id)) {
@@ -188,7 +207,7 @@ const lockTripAspect = async (aspect, tripID, suggestionID, user, Trip) => {
 };
 
 const unlockTripAspect = async (aspect, tripID, user, Trip) => {
-  const trip = await Trip.findOne({ _id: user._id });
+  const trip = await Trip.findOne({ _id: tripID });
   if (String(trip.creator) === String(user._id)) {
     const update = { [aspect + '.isLocked']: false };
     if (!trip[aspect]['isDictated']) update[aspect + '.chosenSuggestion'] = null;
