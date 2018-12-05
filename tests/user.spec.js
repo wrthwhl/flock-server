@@ -425,69 +425,69 @@ describe('user resolvers', () => {
   // });
 
   //
-  test('register user', async () => {
-    const response = await axios.post('http://localhost:4000/graphql', {
-      query: `
-        mutation {
-          register(email: "testuser@testuser.com", password: "tester", user: {firstName: "test", lastName: "user"})
-        }
-  `
-    });
-
-    const { data } = response;
-
-    expect(data).toMatchObject({
-      data: {
-        register: {}
-      }
-    });
-
-    const response2 = await axios.post('http://localhost:4000/graphql', {
-      query: `
-      mutation {
-        login(email: "testuser@testuser.com", password: "tester")
-      }
-
-      `
-    });
-
-    const {
-      data: {
-        login: { token }
-      }
-    } = response2.data;
-
-    const response3 = await axios.post(
-      'http://localhost:4000/graphql',
-      {
-        query: `
-            {
-              self{
-                email
-                lastName
-                firstName
-              }
-            }
-            `
-      },
-      {
-        headers: {
-          'x-token': token
-          // 'x-token': token,
-          // 'x-refresh-token': refreshToken
-          // }
-        }
-      }
-    );
-    //
-    expect(response3.data).toMatchObject({
-      data: {
-        self: {
-          email: 'testuser@testuser.com',
-          lastName: 'user',
-          firstName: 'test'
-        }
-      }
-    });
-  });
+  // test('register user', async () => {
+  //   const response = await axios.post('http://localhost:4000/graphql', {
+  //     query: `
+  //       mutation {
+  //         register(email: "testuser@testuser.com", password: "tester", user: {firstName: "test", lastName: "user"})
+  //       }
+  // `
+  //   });
+  //
+  //   const { data } = response;
+  //
+  //   expect(data).toMatchObject({
+  //     data: {
+  //       register: {}
+  //     }
+  //   });
+  //
+  //   const response2 = await axios.post('http://localhost:4000/graphql', {
+  //     query: `
+  //     mutation {
+  //       login(email: "testuser@testuser.com", password: "tester")
+  //     }
+  //
+  //     `
+  //   });
+  //
+  //   const {
+  //     data: {
+  //       login: { token }
+  //     }
+  //   } = response2.data;
+  //
+  //   const response3 = await axios.post(
+  //     'http://localhost:4000/graphql',
+  //     {
+  //       query: `
+  //           {
+  //             self{
+  //               email
+  //               lastName
+  //               firstName
+  //             }
+  //           }
+  //           `
+  //     },
+  //     {
+  //       headers: {
+  //         'x-token': token
+  //         // 'x-token': token,
+  //         // 'x-refresh-token': refreshToken
+  //         // }
+  //       }
+  //     }
+  //   );
+  //   //
+  //   expect(response3.data).toMatchObject({
+  //     data: {
+  //       self: {
+  //         email: 'testuser@testuser.com',
+  //         lastName: 'user',
+  //         firstName: 'test'
+  //       }
+  //     }
+  //   });
+  // });
 });
