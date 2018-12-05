@@ -224,16 +224,16 @@ const lockTripAspect = async (aspect, tripID, suggestionID, user, Trip) => {
   const trip = await Trip.findOne({ _id: tripID });
   const suggestionIDs = trip[aspect]['suggestions'].map((suggestion) => String(suggestion._id));
   if (!suggestionIDs.includes(String(suggestionID))) throw new Error('Suggestion with provided ID does not exist!');
-  if (String(trip.creator) === String(user._id)) {
-    return await Trip.findOneAndUpdate(
-      { _id: tripID },
-      {
-        [aspect + '.chosenSuggestion']: suggestionID,
-        [aspect + '.isLocked']: true
-      },
-      { new: true }
-    );
-  }
+  if (!String(trip.creator) === String(user._id))
+    throw new Error('Only creator of trip is allowed to lock a trip aspect!');
+  return await Trip.findOneAndUpdate(
+    { _id: tripID },
+    {
+      [aspect + '.chosenSuggestion']: suggestionID,
+      [aspect + '.isLocked']: true
+    },
+    { new: true }
+  );
 };
 
 const unlockTripAspect = async (aspect, tripID, user, Trip) => {
