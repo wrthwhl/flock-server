@@ -1,6 +1,6 @@
 {
   "name": "gtpe-server",
-  "version": "0.0.1",
+  "version": "0.5",
   "description": "",
   "main": "index.js",
   "dependencies": {
@@ -44,20 +44,13 @@
     "dev": "ENV=dev nodemon --exec babel-node src/index.js"
   },
   "lint-staged": {
-    "**/*.{js,jsx}": [
-      "eslint --fix",
-      "git add"
-    ]
+    "**/*.{js,jsx}": [ "eslint --fix", "git add" ]
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mrcknz/gtpe-server.git"
   },
-  "keywords": [
-    "graphql",
-    "node",
-    "apollo"
-  ],
+  "keywords": [ "graphql", "node", "apollo" ],
   "author": "Berta Cume, Christopher Bücklein, Damien Derail, Arturo Branco Moreira Pinto dos Santos, Marco Kunz",
   "license": "MIT",
   "bugs": {
