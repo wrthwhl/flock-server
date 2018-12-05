@@ -1,11 +1,11 @@
 extend type Query {
   trip(id: ID!): Trip
-  allTrips: [Trip]!
 }
 
 extend type Mutation {
   createTrip(trip: TripInput!): Trip!
   addParticipants(tripID: ID, participants: [String!]!): Trip!
+  removeParticipants(tripID: ID, participants: [String!]!): Trip!
   addOrVoteForDestination(tripID: ID, destinations: [DestinationInput!]!): Trip!
   addOrVoteForTimeFrame(tripID: ID!, timeFrames: [TimeFrameInput!]!): Trip!
   addOrVoteForBudget(tripID: ID!, budget: BudgetInput!): Trip!
@@ -26,10 +26,12 @@ extend type Mutation {
   toggleBudgetDictator(tripID: ID!): Trip!
   toggleDestinationDictator(tripID: ID!): Trip!
   toggleTimeFrameDictator(tripID: ID!): Trip!
+  leaveTrip(tripID: ID!): [Trip]!
 }
 
 extend type Subscription {
-  tripInfoChanged: Trip
+  tripInfoChanged(tripID: ID): Trip!
+  ownTripsChanged: [Trip]!
 }
 
 type Trip {
@@ -119,7 +121,7 @@ input DestinationInput {
 }
 
 input BudgetObjectInput {
-  suggestions: [BudgetInput!]!
+  suggestions: [BudgetInput]!
   isDictated: Boolean
 }
 

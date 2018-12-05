@@ -1,4 +1,5 @@
 export default {
   Query: {},
-  Mutation: {}
+  Mutation: {},
+  Subscription: {}
 };

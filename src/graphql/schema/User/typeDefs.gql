@@ -1,10 +1,10 @@
 extend type Query {
-  allUsers: [User]!
   self: User!
 }
 
 extend type Mutation {
   register(email: String!, password: String!, user: UserInput): String
+  facebook(email: String!, accessToken: String!, userID: String!, user: UserInput): String
   login(email: String!, password: String!): String
   updateUser(id: ID!, update: updateUserInput): User!
 }

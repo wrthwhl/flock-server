@@ -3,6 +3,7 @@ import { PubSub, withFilter } from 'apollo-server';
 import {
   createTrip,
   addParticipants,
+  removeParticipants,
   addOrVoteForDestination,
   addOrVoteForTimeFrame,
   addOrVoteForBudget,
@@ -18,7 +19,8 @@ import {
   writeBudetMessage,
   writeGeneralMessage,
   writeTimeFrameMessage,
-  writeDestinationMessage
+  writeDestinationMessage,
+  leaveTrip
 } from '../../../controllers/trip.controller';
 const pubsub = new PubSub();
 
@@ -27,135 +29,163 @@ export default {
     tripInfoChanged: {
       subscribe: withFilter(
         () => pubsub.asyncIterator('TRIPINFO_CHANGED'),
-        async (payload, _, { User, user: { email } }) => {
+        async (payload, { tripID }, { User, user: { email } }) => {
           const user = await User.findOne({ email });
-          const payloadResolved = await payload.tripInfoChanged;
-          const participants = payloadResolved.participants.map((participant) => participant.toString());
-          return participants.includes(user._id.toString());
+          const { tripInfoChanged: updatedTrip } = await payload;
+          const participants = updatedTrip.participants.map((participant) => String(participant));
+          return participants.includes(user._id.toString()) && (!tripID || String(tripID) === String(updatedTrip._id));
+        }
+      )
+    },
+    ownTripsChanged: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator('OWN_TRIPS_CHANGED'),
+        async (payload, _, { user: { _id } }) => {
+          const affectedUser = payload.affectedUser;
+          return String(affectedUser) === String(_id);
         }
       )
     }
   },
 
   Query: {
-    trip: (_, { id }, { Trip }) => Trip.findOne({ _id: id }),
-    allTrips: (_, __, { Trip }) => Trip.find()
+    trip: (_, { id }, { Trip }) => Trip.findOne({ _id: id })
   },
 
   Mutation: {
     createTrip: async (_, { trip }, { Trip, User, user }) => {
-      const newTrip = createTrip(trip, user, { Trip, User });
+      const { newTrip, affectedUsers } = await createTrip(trip, user, { Trip, User });
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
+      affectedUsers.forEach(({ id, allTrips }) => {
+        pubsub.publish('OWN_TRIPS_CHANGED', { ownTripsChanged: allTrips, affectedUser: id });
+      });
       return newTrip;
     },
-    addParticipants: async (_, { tripID, participants }, ctx) => {
-      const newTrip = addParticipants(tripID, participants, ctx);
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-      return newTrip;
+    addParticipants: async (_, { tripID, participants }, { User, Trip }) => {
+      let { updatedTrip, affectedUsers } = await addParticipants(tripID, participants, { User, Trip });
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      affectedUsers.forEach(({ id, allTrips }) => {
+        pubsub.publish('OWN_TRIPS_CHANGED', { ownTripsChanged: allTrips, affectedUser: id });
+      });
+      return updatedTrip;
+    },
+    removeParticipants: async (_, { tripID, participants }, { Trip, User }) => {
+      const { updatedTrip, affectedUsers } = await removeParticipants(tripID, participants, User, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      affectedUsers.forEach(({ id, allTrips }) => {
+        pubsub.publish('OWN_TRIPS_CHANGED', { ownTripsChanged: allTrips, affectedUser: id });
+      });
+      return updatedTrip;
     },
     addOrVoteForDestination: async (_, { tripID, destinations }, { Trip, user }) => {
-      const newTrip = addOrVoteForDestination(tripID, destinations, user, { Trip });
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-      return newTrip;
+      const updatedTrip = addOrVoteForDestination(tripID, destinations, user, { Trip });
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
     },
     addOrVoteForBudget: async (_, { tripID, budget }, { Trip, user }) => {
-      const newTrip = addOrVoteForBudget(tripID, budget, user, { Trip });
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-      return newTrip;
+      const updatedTrip = addOrVoteForBudget(tripID, budget, user, { Trip });
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
     },
     addOrVoteForTimeFrame: async (_, { tripID, timeFrames }, { Trip, user }) => {
-      const newTrip = addOrVoteForTimeFrame(tripID, timeFrames, user, { Trip });
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-      return newTrip;
+      const updatedTrip = addOrVoteForTimeFrame(tripID, timeFrames, user, { Trip });
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
     },
     removeVoteForDestination: async (_, { tripID, suggestionID }, { Trip, user }) => {
-      const newTrip = removeVoteForDestination(tripID, suggestionID, user, Trip);
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-      return newTrip;
+      const updatedTrip = removeVoteForDestination(tripID, suggestionID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
     },
     removeVoteForTimeFrame: async (_, { tripID, suggestionID }, { Trip, user }) => {
-      const newTrip = removeVoteForTimeFrame(tripID, suggestionID, user, Trip);
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-      return newTrip;
+      const updatedTrip = removeVoteForTimeFrame(tripID, suggestionID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
     },
     removeVoteForBudget: async (_, { tripID, suggestionID }, { Trip, user }) => {
-      const newTrip = removeVoteForBudget(tripID, suggestionID, user, Trip);
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-      return newTrip;
+      const updatedTrip = removeVoteForBudget(tripID, suggestionID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
     },
     lockDestination: async (_, { tripID, suggestionID }, { Trip, user }) => {
-      const newTrip = lockDestination(tripID, suggestionID, user, Trip);
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-      return newTrip;
+      const updatedTrip = lockDestination(tripID, suggestionID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
     },
     lockTimeFrame: async (_, { tripID, suggestionID }, { Trip, user }) => {
-      const newTrip = lockTimeFrame(tripID, suggestionID, user, Trip);
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-      return newTrip;
+      const updatedTrip = lockTimeFrame(tripID, suggestionID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
     },
     lockBudget: async (_, { tripID, suggestionID }, { Trip, user }) => {
-      const newTrip = lockBudget(tripID, suggestionID, user, Trip);
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-      return newTrip;
+      const updatedTrip = lockBudget(tripID, suggestionID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
     },
     unlockDestination: async (_, { tripID }, { Trip, user }) => {
-      const newTrip = unlockDestination(tripID, user, Trip);
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-      return newTrip;
+      const updatedTrip = unlockDestination(tripID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
     },
     unlockTimeFrame: async (_, { tripID }, { Trip, user }) => {
-      const newTrip = unlockTimeFrame(tripID, user, Trip);
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-      return newTrip;
+      const updatedTrip = unlockTimeFrame(tripID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
     },
     unlockBudget: async (_, { tripID }, { Trip, user }) => {
-      const newTrip = unlockBudget(tripID, user, Trip);
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-      return newTrip;
+      const updatedTrip = unlockBudget(tripID, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
     },
     addGeneralMessage: async (_, { tripID, message }, { Trip, user }) => {
-      const newTrip = await writeGeneralMessage(tripID, message, user, Trip);
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-      return newTrip;
+      const updatedTrip = await writeGeneralMessage(tripID, message, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
     },
     addBudgetMessage: async (_, { tripID, message }, { Trip, user }) => {
-      const newTrip = await writeBudetMessage(tripID, message, user, Trip);
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-      return newTrip;
+      const updatedTrip = await writeBudetMessage(tripID, message, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
     },
     addTimeFrameMessage: async (_, { tripID, message }, { Trip, user }) => {
-      const newTrip = await writeTimeFrameMessage(tripID, message, user, Trip);
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-      return newTrip;
+      const updatedTrip = await writeTimeFrameMessage(tripID, message, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
     },
     addDestinationMessage: async (_, { tripID, message }, { Trip, user }) => {
-      const newTrip = await writeDestinationMessage(tripID, message, user, Trip);
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-      return newTrip;
+      const updatedTrip = await writeDestinationMessage(tripID, message, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
     },
     toggleBudgetDictator: async (_, { tripID }, { Trip }) => {
-      const newTrip = await Trip.findOne({ _id: tripID }, (err, doc) => {
+      const updatedTrip = await Trip.findOne({ _id: tripID }, (err, doc) => {
         doc.budget.isDictated = !doc.budget.isDictated;
         doc.save();
       });
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-      return newTrip;
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
     },
     toggleDestinationDictator: async (_, { tripID }, { Trip }) => {
-      const newTrip = await Trip.findOne({ _id: tripID }, (err, doc) => {
+      const updatedTrip = await Trip.findOne({ _id: tripID }, (err, doc) => {
         doc.destination.isDictated = !doc.destination.isDictated;
         doc.save();
       });
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-      return newTrip;
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
     },
     toggleTimeFrameDictator: async (_, { tripID }, { Trip }) => {
-      const newTrip = await Trip.findOne({ _id: tripID }, (err, doc) => {
+      const updatedTrip = await Trip.findOne({ _id: tripID }, (err, doc) => {
         doc.timeFrame.isDictated = !doc.timeFrame.isDictated;
         doc.save();
       });
-      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
-      return newTrip;
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
+    },
+    leaveTrip: async (_, { tripID }, { Trip, user: { _id } }) => {
+      const { updatedTrip, allTrips } = await leaveTrip(tripID, _id, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      pubsub.publish('OWN_TRIPS_CHANGED', { ownTripsChanged: allTrips, affectedUser: _id });
+      return allTrips;
     }
   },
 

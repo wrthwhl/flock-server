@@ -11,7 +11,10 @@ const getConfig = (ENV) => {
           'editor.cursorShape': 'block'
         }
       },
-      mongoose: [ 'mongodb://localhost/travelroo', { useNewUrlParser: true } ]
+      mongoose: [ 'mongodb://localhost/travelroo', { useNewUrlParser: true } ],
+      facebook: {
+        serverAccessToken: '' // <-- PUT facebook server access token here!
+      }
     };
   }
 
@@ -27,7 +30,10 @@ const getConfig = (ENV) => {
           'editor.cursorShape': 'block'
         }
       },
-      mongoose: [ 'mongodb://localhost/travelroo', { useNewUrlParser: true } ]
+      mongoose: [ 'mongodb://localhost/travelroo', { useNewUrlParser: true } ],
+      facebook: {
+        serverAccessToken: '' // <-- PUT facebook server access token here!
+      }
     };
   }
 };
