@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
-import config from '../../../config';
 
-export const getJWT = (payload) => jwt.sign(payload, config.SECRET, { expiresIn: '185d' });
+export const getJWT = (payload) => jwt.sign(payload, process.env.AUTH_SECRET, { expiresIn: '185d' });
 
 export const mergeProps = (key, ...objects) => ({
   key,

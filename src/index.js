@@ -1,10 +1,12 @@
+import dotenv from 'dotenv';
+const config = dotenv.config();
+if (config.error) throw new Error('Could not load .env file from root directory', config.error);
 import apollo from './graphql/server';
 import mongoose from './models';
 import * as models from './models';
-import config from '../config';
 
-apollo.launch(models, config.apollo.playground, config.apollo.port, config.SECRET);
+apollo.launch(models, process.env.APOLLO_PORT, process.env.AUTH_SECRET);
 
-mongoose.launch(...config.mongoose);
+mongoose.launch(process.env.DB_URI);
 
 export { mongoose, apollo };

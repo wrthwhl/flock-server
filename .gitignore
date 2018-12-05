@@ -61,6 +61,4 @@ typings/
 .next
 
 # custom
-*config*
-!*config.template*
 dist

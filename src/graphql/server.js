@@ -20,10 +20,9 @@ const getJWTPayload = async (headers, SECRET, res) => {
 };
 
 export default {
-  launch: (models, apolloConfig = {}, port = 4000, SECRET) => {
+  launch: (models, port = 4000, SECRET) => {
     const server = new ApolloServer({
       ...graphQlSchema,
-      ...apolloConfig,
       context: async ({ req, res, connection }) => {
         let user = {};
         if (connection) {
@@ -47,7 +46,7 @@ export default {
         }
       }
     });
-    server
+    return server
       .listen({ port })
       .then(({ url }) => console.log(`✔️  GraphQL up and running, playground ready at ${url}`)) // eslint-disable-line no-console
       .catch((err) => console.error(err)); // eslint-disable-line no-console
