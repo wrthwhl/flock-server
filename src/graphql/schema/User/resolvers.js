@@ -3,7 +3,6 @@ import { AuthenticationError } from 'apollo-server';
 import { PubSub, withFilter } from 'apollo-server';
 import fetch from 'node-fetch';
 import { getJWT } from '../resolver-helpers';
-import config from '../../../../config';
 const pubsub = new PubSub();
 
 export default {
@@ -49,8 +48,9 @@ export default {
     },
     facebook: async (_, { email, accessToken, userID, user = {} }, { User }) => {
       // TODO consider caching facebook token
-      const uri = `https://graph.facebook.com/debug_token?input_token=${accessToken}&access_token=${config.facebook
-        .serverAccessToken}`;
+      console.log('process.env.FB_ServerAcessToken', process.env.FB_ServerAcessToken);
+      const uri = `https://graph.facebook.com/debug_token?input_token=${accessToken}&access_token=${process.env
+        .FB_ServerAcessToken}`;
       const verification = await fetch(uri).then((res) => res.json());
       if (verification.data.is_valid && verification.data.user_id === userID) {
         try {

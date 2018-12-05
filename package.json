@@ -1,11 +1,12 @@
 {
   "name": "gtpe-server",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "",
   "main": "index.js",
   "dependencies": {
     "apollo-server": "^2.2.2",
     "bcrypt": "^3.0.2",
+    "dotenv": "^6.1.0",
     "graphql": "^14.0.2",
     "jsonwebtoken": "^8.4.0",
     "koa": "^2.6.2",
@@ -35,13 +36,12 @@
     "prettier": "^1.15.2"
   },
   "scripts": {
-    "postinstall": "cp config.template.js config.js || true",
     "precommit": "lint-staged",
     "prepush": "jest --coverage",
     "test": "jest --verbose || true",
     "test:watch": "jest --watch",
     "lint": "eslint .",
-    "dev": "ENV=dev nodemon --exec babel-node src/index.js"
+    "dev": "nodemon --exec babel-node src/index.js"
   },
   "lint-staged": {
     "**/*.{js,jsx}": [ "eslint --fix", "git add" ]

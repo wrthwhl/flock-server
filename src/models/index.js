@@ -3,9 +3,9 @@ export { default as User } from './user.model';
 export { default as Trip } from './trip.model';
 
 export default {
-  launch: (...config) => {
+  launch: (uri) => {
     mongoose
-      .connect(...config)
+      .connect(uri, { useNewUrlParser: true })
       .then(() => console.log('✔️  Successfully connected to MongoDB!')) //eslint-disable-line no-console
       .catch((err) => console.error('❌  Could not connect to MongoDB!', err)); //eslint-disable-line no-console
   },
