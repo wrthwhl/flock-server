@@ -54,7 +54,7 @@ type MessageObject {
 }
 
 enum MessageType {
-  TRIP
+  GENERAL
   DESTINATION
   TIMEFRAME
   BUDGET
