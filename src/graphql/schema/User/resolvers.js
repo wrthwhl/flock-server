@@ -66,8 +66,9 @@ export default {
     },
     login: async (_, { email, password }, { User }) => {
       const user = await User.findOne({ email });
-      let valid = process.env.ENV.toLowerCase().includes('dev') && password === 'YouFlock!' ? true : false; // TODO remove PASSEPARTOUT
-      if (!user.password && !valid) throw new Error('User already exists. Please login.');
+      let valid = process.env.FLOCK_ENV === 'DEV' && password === 'YouFlock!' ? true : false; // TODO remove PASSEPARTOUT
+      if (!user) throw new AuthenticationError('E-Mail and password combination seems to be invalid.');
+      if (!user.password && !valid) throw new Error('User already exists. Please try login.');
       if (user && !valid && user.password) {
         valid = true === (await bcrypt.compare(password, user.password));
       }
