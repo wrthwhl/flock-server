@@ -99,6 +99,10 @@ export const addOrVoteForDestination = async (tripID, destinations, user, { Trip
 };
 
 export const addOrVoteForTimeFrame = async (tripID, timeFrames, user, { Trip }) => {
+  timeFrames = timeFrames.map(({ startDate, endDate }) => ({
+    startDate: startDate.split('T')[0] || startDate,
+    endDate: endDate.split('T')[0] || endDate
+  }));
   timeFrames = buildSuggestionsObj(timeFrames, user._id);
   let newTrip;
   const promises = await timeFrames.map(async (timeFrame) => {
