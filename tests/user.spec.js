@@ -161,7 +161,7 @@ describe('trip resolvers', () => {
     const response = await axios.post('http://localhost:4000/graphql', {
       query: `
         mutation{
-          addParticipants(tripID:  "000000000000000000000000", participants: "anne@flock.io")
+          addParticipants(tripID:  "000000000000000000000000", participants: "barbara@flock.io")
           {
             participants{
               email
@@ -192,7 +192,7 @@ describe('trip resolvers', () => {
               email: 'marco@flock.io'
             },
             {
-              email: 'anne@flock.io'
+              email: 'barbara@flock.io'
             }
           ]
         }
@@ -357,156 +357,137 @@ describe('user resolvers', () => {
       }
     });
   });
+
+  // test('allUsers', async () => {
+  //   const response = await axios.post('http://localhost:4000/graphql', {
+  //     query: `
+  //         {
+  //           allUsers {
+  //             firstName
+  //             lastName
+  //
+  //           }
+  //         }
+  //         `
+  //   });
+  //
+  //   const { data } = response;
+  //   expect(data).toMatchObject({
+  //     data: {
+  //       allUsers: [
+  //         {
+  //           firstName: 'Damien',
+  //           lastName: 'Derail'
+  //         },
+  //         {
+  //           firstName: 'Berta',
+  //           lastName: 'Cume'
+  //         },
+  //         {
+  //           firstName: 'Christopherausor',
+  //           lastName: 'Bücklein'
+  //         },
+  //         {
+  //           firstName: 'Arturo',
+  //           lastName: 'Moreira Santos'
+  //         },
+  //         {
+  //           firstName: 'Marco',
+  //           lastName: 'Kunz'
+  //         },
+  //         {
+  //           firstName: 'Damien1',
+  //           lastName: 'Derail'
+  //         },
+  //         {
+  //           firstName: 'Christopher1',
+  //           lastName: 'Bücklein'
+  //         },
+  //         {
+  //           firstName: 'Berta1',
+  //           lastName: 'Cume'
+  //         },
+  //         {
+  //           firstName: 'Arturo1',
+  //           lastName: 'Moreira Santos'
+  //         },
+  //         {
+  //           firstName: 'Marco1',
+  //           lastName: 'Kunz'
+  //         },
+  //         {
+  //           firstName: null,
+  //           lastName: null
+  //         }
+  //       ]
+  //     }
+  //   });
+  // });
+
+  //
+  test('register user', async () => {
+    const response = await axios.post('http://localhost:4000/graphql', {
+      query: `
+        mutation {
+          register(email: "testuser@testuser.com", password: "tester", user: {firstName: "test", lastName: "user"})
+        }
+  `
+    });
+
+    const { data } = response;
+
+    expect(data).toMatchObject({
+      data: {
+        register: {}
+      }
+    });
+
+    const response2 = await axios.post('http://localhost:4000/graphql', {
+      query: `
+      mutation {
+        login(email: "testuser@testuser.com", password: "tester")
+      }
+
+      `
+    });
+
+    const {
+      data: {
+        login: { token }
+      }
+    } = response2.data;
+
+    const response3 = await axios.post(
+      'http://localhost:4000/graphql',
+      {
+        query: `
+            {
+              self{
+                email
+                lastName
+                firstName
+              }
+            }
+            `
+      },
+      {
+        headers: {
+          'x-token': token
+          // 'x-token': token,
+          // 'x-refresh-token': refreshToken
+          // }
+        }
+      }
+    );
+    //
+    expect(response3.data).toMatchObject({
+      data: {
+        self: {
+          email: 'testuser@testuser.com',
+          lastName: 'user',
+          firstName: 'test'
+        }
+      }
+    });
+  });
 });
-// test('create user', async () => {
-//   const response = await axios.post('http://localhost:4000/graphql', {
-//     query: `
-//     mutation {
-//       register(email: "testuser@testuser.com", password: "tester", user: {firstName: 'test', lastName: 'user'}) {
-//         {
-//           firstName
-//           lastName
-//           email
-//         }
-//       }
-//     }
-//     `
-//   });
-//
-//   const { data } = response;
-//   expect(data).toMatchObject({
-//     data: {
-//       register: {
-//         user: {
-//           firstName: 'test',
-//           lastName: 'user',
-//           email: 'testuser@testuser.com'
-//         }
-//       }
-//     }
-//   });
-// });
-//
-//   const response2 = await axios.post('http://localhost:4000/graphql', {
-//     query: `
-//     mutation {
-//       login(email: "testuser@testuser.com", password: "tester") {
-//         token
-//         refreshToken
-//       }
-//     }
-//     `
-//   });
-//
-//   const {
-//     data: {
-//       login: { token, refreshToken }
-//     }
-//   } = response2.data;
-
-// const response3 = await axios.post(
-//   'http://localhost:4000/graphql',
-//   {
-//     query: `
-//   mutation {
-//     createTeam(name: "team1") {
-//       ok
-//       team {
-//         name
-//       }
-//     }
-//   }
-//   `
-//   },
-//   {
-//     headers: {
-//       'x-token': token,
-//       'x-refresh-token': refreshToken
-//     }
-//   }
-// );
-
-// expect(response3.data).toMatchObject({
-//   data: {
-//     createTeam: {
-//       ok: true,
-//       team: {
-//         name: 'team1'
-//       }
-//     }
-//   }
-// });
-
-// describe('user resolvers', () => {
-//   test('allUsers', async () => {
-//     const response = await axios.post('http://localhost:4000/graphql', {
-//       query: `
-//       query {
-//         allUsers {
-//           firstName
-//           lastName
-//           email
-//         }
-//       }
-//       `
-//     });
-//
-//     const { data } = response;
-//     expect(data).toMatchObject({
-//       data: {
-//         allUsers: [
-//           {
-//             firstName: 'Damien',
-//             lastName: 'Derail',
-//             email: 'damien@flock.io'
-//           },
-//           {
-//             firstName: 'Christopher',
-//             lastName: 'Bücklein',
-//             email: 'christopher@flock.io'
-//           },
-//           {
-//             firstName: 'Berta',
-//             lastName: 'Cume',
-//             email: 'berta@flock.io'
-//           },
-//           {
-//             firstName: 'Arturo',
-//             lastName: 'Moreira Santos',
-//             email: 'arturo@flock.io'
-//           },
-//           {
-//             firstName: 'Berta1',
-//             lastName: 'Cume',
-//             email: 'berta1@flock.io'
-//           },
-//           {
-//             firstName: 'Damien1',
-//             lastName: 'Derail',
-//             email: 'damien1@flock.io'
-//           },
-//           {
-//             firstName: 'Christopher1',
-//             lastName: 'Bücklein',
-//             email: 'christopher1@flock.io'
-//           },
-//           {
-//             firstName: 'Marco',
-//             lastName: 'Kunz',
-//             email: 'marco@flock.io'
-//           },
-//           {
-//             firstName: 'Arturo1',
-//             lastName: 'Moreira Santos',
-//             email: 'arturo1@flock.io'
-//           },
-//           {
-//             firstName: 'Marco1',
-//             lastName: 'Kunz',
-//             email: 'marco1@flock.io'
-//           }
-//         ]
-//       }
-//     });
-//   });
-// });
