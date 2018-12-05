@@ -238,11 +238,11 @@ const lockTripAspect = async (aspect, tripID, suggestionID, user, Trip) => {
 
 const unlockTripAspect = async (aspect, tripID, user, Trip) => {
   const trip = await Trip.findOne({ _id: tripID });
-  if (String(trip.creator) === String(user._id)) {
-    const update = { [aspect + '.isLocked']: false };
-    if (!trip[aspect]['isDictated']) update[aspect + '.chosenSuggestion'] = null;
-    return await Trip.findOneAndUpdate({ _id: tripID }, update, { new: true });
-  }
+  if (!String(trip.creator) === String(user._id))
+    throw new Error('Only creator of trip is allowed to unlock a trip aspect!');
+  const update = { [aspect + '.isLocked']: false };
+  if (!trip[aspect]['isDictated']) update[aspect + '.chosenSuggestion'] = null;
+  return await Trip.findOneAndUpdate({ _id: tripID }, update, { new: true });
 };
 
 export const lockDestination = (...args) => lockTripAspect('destination', ...args);
