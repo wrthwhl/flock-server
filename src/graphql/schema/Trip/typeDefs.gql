@@ -18,7 +18,6 @@ extend type Mutation {
   unlockDestination(tripID: ID!): Trip!
   unlockTimeFrame(tripID: ID!): Trip!
   unlockBudget(tripID: ID!): Trip!
-  addChatMessage(tripID: ID!, message: String!): Trip!
   toggleDictator(tripID: ID!, property: String!): Trip!
   addGeneralMessage(tripID: ID!, message: String!): Trip!
   addTimeFrameMessage(tripID: ID!, message: String!): Trip!
