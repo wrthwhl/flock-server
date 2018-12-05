@@ -333,6 +333,110 @@ describe('trip resolvers', () => {
   });
 });
 
+describe('user resolvers', () => {
+  test('update user', async () => {
+    const response = await axios.post('http://localhost:4000/graphql', {
+      query: `
+        mutation{
+          updateUser(id: "111111111111111111111111", update: {firstName: "Christopherausor"})
+          {
+            firstName
+            lastName
+          }
+        }
+      `
+    });
+
+    const { data } = response;
+    expect(data).toMatchObject({
+      data: {
+        updateUser: {
+          firstName: 'Christopherausor',
+          lastName: 'Bücklein'
+        }
+      }
+    });
+  });
+});
+// test('create user', async () => {
+//   const response = await axios.post('http://localhost:4000/graphql', {
+//     query: `
+//     mutation {
+//       register(email: "testuser@testuser.com", password: "tester", user: {firstName: 'test', lastName: 'user'}) {
+//         {
+//           firstName
+//           lastName
+//           email
+//         }
+//       }
+//     }
+//     `
+//   });
+//
+//   const { data } = response;
+//   expect(data).toMatchObject({
+//     data: {
+//       register: {
+//         user: {
+//           firstName: 'test',
+//           lastName: 'user',
+//           email: 'testuser@testuser.com'
+//         }
+//       }
+//     }
+//   });
+// });
+//
+//   const response2 = await axios.post('http://localhost:4000/graphql', {
+//     query: `
+//     mutation {
+//       login(email: "testuser@testuser.com", password: "tester") {
+//         token
+//         refreshToken
+//       }
+//     }
+//     `
+//   });
+//
+//   const {
+//     data: {
+//       login: { token, refreshToken }
+//     }
+//   } = response2.data;
+
+// const response3 = await axios.post(
+//   'http://localhost:4000/graphql',
+//   {
+//     query: `
+//   mutation {
+//     createTeam(name: "team1") {
+//       ok
+//       team {
+//         name
+//       }
+//     }
+//   }
+//   `
+//   },
+//   {
+//     headers: {
+//       'x-token': token,
+//       'x-refresh-token': refreshToken
+//     }
+//   }
+// );
+
+// expect(response3.data).toMatchObject({
+//   data: {
+//     createTeam: {
+//       ok: true,
+//       team: {
+//         name: 'team1'
+//       }
+//     }
+//   }
+// });
+
 // describe('user resolvers', () => {
 //   test('allUsers', async () => {
 //     const response = await axios.post('http://localhost:4000/graphql', {
@@ -405,81 +509,4 @@ describe('trip resolvers', () => {
 //       }
 //     });
 //   });
-// });
-// test('create user', async () => {
-//   const response = await axios.post('http://localhost:4000/graphql', {
-//     query: `
-//     mutation {
-//       register(email: "testuser@testuser.com", password: "tester", user: {firstName: 'test', lastName: 'user'}) {
-//         {
-//           firstName
-//           lastName
-//           email
-//         }
-//       }
-//     }
-//     `
-//   });
-//
-//   const { data } = response;
-//   expect(data).toMatchObject({
-//     data: {
-//       register: {
-//         user: {
-//           firstName: 'test',
-//           lastName: 'user',
-//           email: 'testuser@testuser.com'
-//         }
-//       }
-//     }
-//   });
-//
-//   const response2 = await axios.post('http://localhost:4000/graphql', {
-//     query: `
-//     mutation {
-//       login(email: "testuser@testuser.com", password: "tester") {
-//         token
-//         refreshToken
-//       }
-//     }
-//     `
-//   });
-//
-//   const {
-//     data: {
-//       login: { token, refreshToken }
-//     }
-//   } = response2.data;
-
-// const response3 = await axios.post(
-//   'http://localhost:4000/graphql',
-//   {
-//     query: `
-//   mutation {
-//     createTeam(name: "team1") {
-//       ok
-//       team {
-//         name
-//       }
-//     }
-//   }
-//   `
-//   },
-//   {
-//     headers: {
-//       'x-token': token,
-//       'x-refresh-token': refreshToken
-//     }
-//   }
-// );
-
-// expect(response3.data).toMatchObject({
-//   data: {
-//     createTeam: {
-//       ok: true,
-//       team: {
-//         name: 'team1'
-//       }
-//     }
-//   }
 // });
