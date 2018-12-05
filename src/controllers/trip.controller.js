@@ -245,6 +245,24 @@ const unlockTripAspect = async (aspect, tripID, user, Trip) => {
   return await Trip.findOneAndUpdate({ _id: tripID }, update, { new: true });
 };
 
+const writeMessageAspect = async (aspect, tripID, message, user, Trip) => {
+  try {
+    const newTrip = await Trip.findOneAndUpdate(
+      {
+        _id: tripID
+      },
+      { $push: { messages: { message, creator: user._id, type: aspect } } },
+      { new: true }
+    );
+
+    newTrip.messages = newTrip.messages.sort((a, b) => a.createdAt - b.createdAt);
+
+    return newTrip;
+  } catch (e) {
+    throw new Error('Could not create chat message. Your flock maybe has already flown away', e);
+  }
+};
+
 export const lockDestination = (...args) => lockTripAspect('destination', ...args);
 export const lockTimeFrame = (...args) => lockTripAspect('timeFrame', ...args);
 export const lockBudget = (...args) => lockTripAspect('budget', ...args);
@@ -253,6 +271,10 @@ export const unlockDestination = (...args) => unlockTripAspect('destination', ..
 export const unlockTimeFrame = (...args) => unlockTripAspect('timeFrame', ...args);
 export const unlockBudget = (...args) => unlockTripAspect('budget', ...args);
 
+export const writeGeneralMessage = (...args) => writeMessageAspect('GENERAL', ...args);
+export const writeDestinationMessage = (...args) => writeMessageAspect('DESTINATION', ...args);
+export const writeTimeFrameMessage = (...args) => writeMessageAspect('TIMEFRAME', ...args);
+export const writeBudetMessage = (...args) => writeMessageAspect('BUDGET', ...args);
 export const leaveTrip = async (tripID, _id, Trip) => {
   const tripThatWillBeLeft = await Trip.findOne({ _id: tripID });
   if (!_id || !tripThatWillBeLeft) throw new Error('Could not process request for logged-in user to leave trip.');

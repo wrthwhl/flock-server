@@ -16,6 +16,10 @@ import {
   unlockDestination,
   unlockTimeFrame,
   unlockBudget,
+  writeBudetMessage,
+  writeGeneralMessage,
+  writeTimeFrameMessage,
+  writeDestinationMessage,
   leaveTrip
 } from '../../../controllers/trip.controller';
 const pubsub = new PubSub();
@@ -133,6 +137,50 @@ export default {
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
       return updatedTrip;
     },
+    addGeneralMessage: async (_, { tripID, message }, { Trip, user }) => {
+      const updatedTrip = await writeGeneralMessage(tripID, message, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
+    },
+    addBudgetMessage: async (_, { tripID, message }, { Trip, user }) => {
+      const updatedTrip = await writeBudetMessage(tripID, message, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
+    },
+    addTimeFrameMessage: async (_, { tripID, message }, { Trip, user }) => {
+      const updatedTrip = await writeTimeFrameMessage(tripID, message, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
+    },
+    addDestinationMessage: async (_, { tripID, message }, { Trip, user }) => {
+      const updatedTrip = await writeDestinationMessage(tripID, message, user, Trip);
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
+    },
+    toggleBudgetDictator: async (_, { tripID }, { Trip }) => {
+      const updatedTrip = await Trip.findOne({ _id: tripID }, (err, doc) => {
+        doc.budget.isDictated = !doc.budget.isDictated;
+        doc.save();
+      });
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
+    },
+    toggleDestinationDictator: async (_, { tripID }, { Trip }) => {
+      const updatedTrip = await Trip.findOne({ _id: tripID }, (err, doc) => {
+        doc.destination.isDictated = !doc.destination.isDictated;
+        doc.save();
+      });
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
+    },
+    toggleTimeFrameDictator: async (_, { tripID }, { Trip }) => {
+      const updatedTrip = await Trip.findOne({ _id: tripID }, (err, doc) => {
+        doc.timeFrame.isDictated = !doc.timeFrame.isDictated;
+        doc.save();
+      });
+      pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
+      return updatedTrip;
+    },
     leaveTrip: async (_, { tripID }, { Trip, user: { _id } }) => {
       const { updatedTrip, allTrips } = await leaveTrip(tripID, _id, Trip);
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: updatedTrip });
@@ -164,6 +212,9 @@ export default {
   },
   TimeFrame: {
     voters,
+    creator
+  },
+  MessageObject: {
     creator
   }
 };
