@@ -86,6 +86,12 @@ describe('trip resolvers', () => {
                 value: 500
               },
               {
+                value: 600
+              },
+              {
+                value: 700
+              },
+              {
                 value: 100
               }
             ]
@@ -124,26 +130,11 @@ describe('trip resolvers', () => {
               {
                 voters: [
                   {
-                    email: 'christopher@flock.io'
-                  },
-                  {
                     email: 'marco@flock.io'
                   }
                 ],
-                startDate: '2018-12-16T00:00:00.000Z',
-                endDate: '2018-12-23T00:00:00.000Z'
-              },
-              {
-                voters: [
-                  {
-                    email: 'christopher@flock.io'
-                  },
-                  {
-                    email: 'marco@flock.io'
-                  }
-                ],
-                startDate: '2018-12-16T00:00:00.000Z',
-                endDate: '2018-12-23T00:00:00.000Z'
+                startDate: '2018-12-10T00:00:00.000Z',
+                endDate: '2018-12-16T00:00:00.000Z'
               },
               {
                 voters: [],
@@ -203,7 +194,7 @@ describe('trip resolvers', () => {
   test('remove vote for destination', async () => {
     const response = await axios.post('http://localhost:4000/graphql', {
       query: `mutation{
-          removeVoteForDestination(tripID:"000000000000000000000000", destinationID: "111111111111111111111111")
+          removeVoteForDestination(tripID:"000000000000000000000000",suggestionID: "111111111111111111111111")
         {
           destination{
             suggestions{
@@ -358,136 +349,67 @@ describe('user resolvers', () => {
     });
   });
 
-  // test('allUsers', async () => {
-  //   const response = await axios.post('http://localhost:4000/graphql', {
-  //     query: `
-  //         {
-  //           allUsers {
-  //             firstName
-  //             lastName
-  //
-  //           }
-  //         }
-  //         `
-  //   });
-  //
-  //   const { data } = response;
-  //   expect(data).toMatchObject({
-  //     data: {
-  //       allUsers: [
-  //         {
-  //           firstName: 'Damien',
-  //           lastName: 'Derail'
-  //         },
-  //         {
-  //           firstName: 'Berta',
-  //           lastName: 'Cume'
-  //         },
-  //         {
-  //           firstName: 'Christopherausor',
-  //           lastName: 'Bücklein'
-  //         },
-  //         {
-  //           firstName: 'Arturo',
-  //           lastName: 'Moreira Santos'
-  //         },
-  //         {
-  //           firstName: 'Marco',
-  //           lastName: 'Kunz'
-  //         },
-  //         {
-  //           firstName: 'Damien1',
-  //           lastName: 'Derail'
-  //         },
-  //         {
-  //           firstName: 'Christopher1',
-  //           lastName: 'Bücklein'
-  //         },
-  //         {
-  //           firstName: 'Berta1',
-  //           lastName: 'Cume'
-  //         },
-  //         {
-  //           firstName: 'Arturo1',
-  //           lastName: 'Moreira Santos'
-  //         },
-  //         {
-  //           firstName: 'Marco1',
-  //           lastName: 'Kunz'
-  //         },
-  //         {
-  //           firstName: null,
-  //           lastName: null
-  //         }
-  //       ]
-  //     }
-  //   });
-  // });
+  test('register user', async () => {
+    const response = await axios.post('http://localhost:4000/graphql', {
+      query: `
+        mutation {
+          register(email: "testuser@testuser.com", password: "tester", user: {firstName: "test", lastName: "user"})
+        }
+  `
+    });
 
-  //
-  // test('register user', async () => {
-  //   const response = await axios.post('http://localhost:4000/graphql', {
-  //     query: `
-  //       mutation {
-  //         register(email: "testuser@testuser.com", password: "tester", user: {firstName: "test", lastName: "user"})
-  //       }
-  // `
-  //   });
-  //
-  //   const { data } = response;
-  //
-  //   expect(data).toMatchObject({
-  //     data: {
-  //       register: {}
-  //     }
-  //   });
-  //
-  //   const response2 = await axios.post('http://localhost:4000/graphql', {
-  //     query: `
-  //     mutation {
-  //       login(email: "testuser@testuser.com", password: "tester")
-  //     }
-  //
-  //     `
-  //   });
-  //
-  //   const {
-  //     data: {
-  //       login: { token }
-  //     }
-  //   } = response2.data;
-  //
-  //   const response3 = await axios.post(
-  //     'http://localhost:4000/graphql',
-  //     {
-  //       query: `
-  //           {
-  //             self{
-  //               email
-  //               lastName
-  //               firstName
-  //             }
-  //           }
-  //           `
-  //     },
-  //     {
-  //       headers: {
-  //         'x-token': token
-  //         // 'x-token': token,
-  //         // 'x-refresh-token': refreshToken
-  //         // }
-  //       }
-  //     }
-  //   );
-  //   //
-  //   expect(response3.data).toMatchObject({
-  //     data: {
-  //       self: {
-  //         email: 'testuser@testuser.com',
-  //         lastName: 'user',
-  //         firstName: 'test'
-  //       }
-  //     }
-  //   });
-  // });
+    const { data } = response;
+
+    expect(data).toMatchObject({
+      data: {
+        register: {}
+      }
+    });
+
+    const response2 = await axios.post('http://localhost:4000/graphql', {
+      query: `
+      mutation {
+        login(email: "testuser@testuser.com", password: "tester")
+      }
+
+      `
+    });
+
+    const {
+      data: {
+        login: { token, refreshToken }
+      }
+    } = response2.data;
+
+    const response3 = await axios.post(
+      'http://localhost:4000/graphql',
+      {
+        query: `
+            {
+              self{
+                email
+                lastName
+                firstName
+              }
+            }
+            `
+      },
+      {
+        headers: {
+          'x-token': token,
+          'x-refresh-token': refreshToken
+        }
+      }
+    );
+    //
+    expect(response3.data).toMatchObject({
+      data: {
+        self: {
+          email: 'testuser@testuser.com',
+          lastName: 'user',
+          firstName: 'test'
+        }
+      }
+    });
+  });
 });
