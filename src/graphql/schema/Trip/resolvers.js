@@ -64,6 +64,7 @@ export default {
         Trip,
         User
       });
+      sendEmail({ trip, user });
       pubsub.publish('TRIPINFO_CHANGED', { tripInfoChanged: newTrip });
 
       affectedUsers.forEach(({ id, allTrips }) => {

@@ -15,6 +15,10 @@ const getConfig = ENV => {
       mongoose: ['mongodb://localhost/travelroo', { useNewUrlParser: true }],
       facebook: {
         serverAccessToken: '' // <-- PUT facebook server access token here!
+      },
+      email: {
+        user: 'deyz3ih5hicb3xba@ethereal.email',
+        password: 'ZGjFQHdw9AK6Vbjkq5' //ethereal user and pwd account for sending email
       }
     };
   }
