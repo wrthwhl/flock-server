@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
-const config = dotenv.config();
-if (config.error) throw new Error('Could not load .env file from root directory', config.error);
+dotenv.config();
 import apollo from './graphql/server';
 import mongoose from './models';
 import * as models from './models';
