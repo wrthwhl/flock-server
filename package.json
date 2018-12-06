@@ -36,6 +36,7 @@
     "prettier": "^1.15.2"
   },
   "scripts": {
+    "start": "nodemon --exec babel-node src/index.js",
     "precommit": "lint-staged",
     "prepush": "jest --coverage",
     "test": "jest --verbose || true",
