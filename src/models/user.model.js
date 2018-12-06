@@ -12,12 +12,4 @@ const UserSchema = new Schema({
 
 const User = mongoose.model('users', UserSchema);
 
-// TODO remove
-import { getUsers } from '../../seeds/seedFunctions';
-(async () => {
-  await User.deleteMany({});
-  const [ ...users ] = getUsers(10);
-  User.create(users);
-})();
-
 export default User;
