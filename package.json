@@ -11,7 +11,7 @@
     "jsonwebtoken": "^8.4.0",
     "koa": "^2.6.2",
     "lodash.merge": "^4.6.1",
-    "mongoose": "^5.3.13",
+    "mongoose": "^5.7.5",
     "nodemon": "^1.18.7"
   },
   "devDependencies": {
